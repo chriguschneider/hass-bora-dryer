@@ -59,6 +59,10 @@ another model, please open an issue with the contents of `/info.html`.
 
 ## Changelog
 
+- **v0.3.2** — Setup tolerates an offline device (e.g. when the upstream
+  Shelly has cut power). Entities are registered with state `unavailable`
+  instead of failing to load entirely until the device is reachable. Closes
+  [#1](https://github.com/chriguschneider/hass-bora-dryer/issues/1).
 - **v0.3.1** — Optional power & energy mirror sensors. Pick the upstream
   Shelly's power and energy entities in the integration's options and they
   appear under the BORA device alongside the existing entities.
