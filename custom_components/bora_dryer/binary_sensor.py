@@ -24,6 +24,8 @@ class BoraBinarySensorEntityDescription(BinarySensorEntityDescription):
     """Binary sensor description with a value extractor."""
 
     value_fn: Callable[[BoraDataUpdateCoordinator], bool | None]
+    # See sensor.BoraSensorEntityDescription.survives_offline.
+    survives_offline: bool = False
 
 
 def _is_drying(coordinator: BoraDataUpdateCoordinator) -> bool | None:
@@ -49,12 +51,14 @@ BINARY_SENSORS: tuple[BoraBinarySensorEntityDescription, ...] = (
         translation_key="is_drying",
         device_class=BinarySensorDeviceClass.RUNNING,
         value_fn=_is_drying,
+        survives_offline=True,
     ),
     BoraBinarySensorEntityDescription(
         key="filter_due",
         translation_key="filter_due",
         device_class=BinarySensorDeviceClass.PROBLEM,
         value_fn=_filter_due,
+        survives_offline=True,
     ),
 )
 
@@ -87,3 +91,11 @@ class BoraBinarySensor(BoraEntity, BinarySensorEntity):
     @property
     def is_on(self) -> bool | None:
         return self.entity_description.value_fn(self.coordinator)
+
+    @property
+    def available(self) -> bool:
+        if not self.entity_description.survives_offline:
+            return super().available
+        if self.coordinator.data is None:
+            return False
+        return self.entity_description.value_fn(self.coordinator) is not None

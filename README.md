@@ -59,6 +59,11 @@ another model, please open an issue with the contents of `/info.html`.
 
 ## Changelog
 
+- **v0.5.0** — Filter, firmware, operation and drying sensors retain their
+  last successful value while the device is unreachable, instead of going
+  `unavailable`. Temperature and humidity still go `unavailable`, since a
+  stale reading would be misleading. Closes
+  [#2](https://github.com/chriguschneider/hass-bora-dryer/issues/2).
 - **v0.4.0** — Built-in filter-maintenance repair issue. The integration
   now raises a Home Assistant repair issue (Settings → Repairs) when filter
   operating hours exceed the configured threshold; it clears automatically

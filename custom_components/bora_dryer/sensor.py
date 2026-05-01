@@ -41,6 +41,11 @@ class BoraSensorEntityDescription(SensorEntityDescription):
     """Sensor description with a value extractor."""
 
     value_fn: Callable[[dict[str, Any]], Any]
+    # When True, retain the last successful value while the device is
+    # unreachable instead of going `unavailable`. Use only for fields where
+    # the last value remains factually meaningful when the device is off
+    # (filter wear, firmware version, last-known operation).
+    survives_offline: bool = False
 
 
 def _filter_remaining(data: dict[str, Any]) -> int | None:
@@ -81,6 +86,7 @@ SENSORS: tuple[BoraSensorEntityDescription, ...] = (
         translation_key="operation_state",
         icon="mdi:state-machine",
         value_fn=lambda d: d.get("operation_state"),
+        survives_offline=True,
     ),
     BoraSensorEntityDescription(
         key="filter_hours",
@@ -89,6 +95,7 @@ SENSORS: tuple[BoraSensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfTime.HOURS,
         icon="mdi:air-filter",
         value_fn=lambda d: d.get("filter_hours"),
+        survives_offline=True,
     ),
     BoraSensorEntityDescription(
         key="filter_remaining_hours",
@@ -96,6 +103,7 @@ SENSORS: tuple[BoraSensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfTime.HOURS,
         icon="mdi:timer-sand",
         value_fn=_filter_remaining,
+        survives_offline=True,
     ),
     BoraSensorEntityDescription(
         key="filter_progress_percent",
@@ -103,6 +111,7 @@ SENSORS: tuple[BoraSensorEntityDescription, ...] = (
         native_unit_of_measurement=PERCENTAGE,
         icon="mdi:gauge",
         value_fn=_filter_progress_percent,
+        survives_offline=True,
     ),
     BoraSensorEntityDescription(
         key="firmware_version",
@@ -110,6 +119,7 @@ SENSORS: tuple[BoraSensorEntityDescription, ...] = (
         entity_category=EntityCategory.DIAGNOSTIC,
         icon="mdi:chip",
         value_fn=lambda d: d.get("firmware_version"),
+        survives_offline=True,
     ),
 )
 
@@ -176,6 +186,13 @@ class BoraSensor(BoraEntity, SensorEntity):
     @property
     def native_value(self) -> Any:
         return self.entity_description.value_fn(self.coordinator.data or {})
+
+    @property
+    def available(self) -> bool:
+        if not self.entity_description.survives_offline:
+            return super().available
+        data = self.coordinator.data
+        return data is not None and self.entity_description.value_fn(data) is not None
 
 
 class BoraMirrorSensor(BoraEntity, SensorEntity):
