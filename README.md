@@ -57,6 +57,17 @@ Likely works with the entire BORA 4xx series (BORA 408 / 410 / 415 / 420),
 since they share the same controller. Only tested on BORA 410. If you have
 another model, please open an issue with the contents of `/info.html`.
 
+## Changelog
+
+- **v0.3.0** — BORA device is shown as *connected via* the upstream power
+  switch device (e.g. a Shelly), once that switch is configured in the
+  integration's options.
+- **v0.2.0** — Live LCD camera, set-clock button, options flow with
+  power-switch wrapper and configurable filter-due threshold, derived
+  filter-remaining and filter-progress sensors.
+- **v0.1.0** — Initial release: status sensors, drying & filter-due binary
+  sensors.
+
 ## License
 
 MIT
