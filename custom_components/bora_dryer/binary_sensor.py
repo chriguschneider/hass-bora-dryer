@@ -19,13 +19,17 @@ from .coordinator import BoraDataUpdateCoordinator
 from .entity import BoraEntity
 
 
+_UNSET: Any = object()
+
+
 @dataclass(frozen=True, kw_only=True)
 class BoraBinarySensorEntityDescription(BinarySensorEntityDescription):
     """Binary sensor description with a value extractor."""
 
     value_fn: Callable[[BoraDataUpdateCoordinator], bool | None]
-    # See sensor.BoraSensorEntityDescription.survives_offline.
+    # See sensor.BoraSensorEntityDescription.survives_offline / offline_value.
     survives_offline: bool = False
+    offline_value: Any = _UNSET
 
 
 def _is_drying(coordinator: BoraDataUpdateCoordinator) -> bool | None:
@@ -52,6 +56,7 @@ BINARY_SENSORS: tuple[BoraBinarySensorEntityDescription, ...] = (
         device_class=BinarySensorDeviceClass.RUNNING,
         value_fn=_is_drying,
         survives_offline=True,
+        offline_value=False,
     ),
     BoraBinarySensorEntityDescription(
         key="filter_due",
@@ -90,12 +95,22 @@ class BoraBinarySensor(BoraEntity, BinarySensorEntity):
 
     @property
     def is_on(self) -> bool | None:
-        return self.entity_description.value_fn(self.coordinator)
+        desc = self.entity_description
+        if (
+            desc.survives_offline
+            and desc.offline_value is not _UNSET
+            and not self.coordinator.last_update_success
+        ):
+            return desc.offline_value
+        return desc.value_fn(self.coordinator)
 
     @property
     def available(self) -> bool:
-        if not self.entity_description.survives_offline:
+        desc = self.entity_description
+        if not desc.survives_offline:
             return super().available
+        if desc.offline_value is not _UNSET:
+            return True
         if self.coordinator.data is None:
             return False
-        return self.entity_description.value_fn(self.coordinator) is not None
+        return desc.value_fn(self.coordinator) is not None

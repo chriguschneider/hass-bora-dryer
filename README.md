@@ -59,6 +59,11 @@ another model, please open an issue with the contents of `/info.html`.
 
 ## Changelog
 
+- **v0.5.1** — When the device is unreachable, `Operation` reports `Off`
+  and `Drying` reports `false` instead of freezing on the last live value.
+  This avoids stuck `Drying` readings when the user cuts power mid-cycle.
+  Filter sensors and firmware version still retain their last value (those
+  remain factually correct when offline).
 - **v0.5.0** — Filter, firmware, operation and drying sensors retain their
   last successful value while the device is unreachable, instead of going
   `unavailable`. Temperature and humidity still go `unavailable`, since a

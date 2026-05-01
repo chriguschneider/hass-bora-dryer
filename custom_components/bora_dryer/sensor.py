@@ -36,16 +36,22 @@ from .coordinator import BoraDataUpdateCoordinator
 from .entity import BoraEntity
 
 
+_UNSET: Any = object()
+
+
 @dataclass(frozen=True, kw_only=True)
 class BoraSensorEntityDescription(SensorEntityDescription):
     """Sensor description with a value extractor."""
 
     value_fn: Callable[[dict[str, Any]], Any]
-    # When True, retain the last successful value while the device is
-    # unreachable instead of going `unavailable`. Use only for fields where
-    # the last value remains factually meaningful when the device is off
+    # When True, the entity stays available while the device is unreachable
     # (filter wear, firmware version, last-known operation).
     survives_offline: bool = False
+    # When set (and survives_offline=True), this synthetic value is reported
+    # while the device is unreachable instead of the last live value. Use for
+    # state-like fields where a frozen reading would lie about reality
+    # (operation: "Off" is more honest than a stuck "Drying").
+    offline_value: Any = _UNSET
 
 
 def _filter_remaining(data: dict[str, Any]) -> int | None:
@@ -87,6 +93,7 @@ SENSORS: tuple[BoraSensorEntityDescription, ...] = (
         icon="mdi:state-machine",
         value_fn=lambda d: d.get("operation_state"),
         survives_offline=True,
+        offline_value="Off",
     ),
     BoraSensorEntityDescription(
         key="filter_hours",
@@ -185,14 +192,24 @@ class BoraSensor(BoraEntity, SensorEntity):
 
     @property
     def native_value(self) -> Any:
-        return self.entity_description.value_fn(self.coordinator.data or {})
+        desc = self.entity_description
+        if (
+            desc.survives_offline
+            and desc.offline_value is not _UNSET
+            and not self.coordinator.last_update_success
+        ):
+            return desc.offline_value
+        return desc.value_fn(self.coordinator.data or {})
 
     @property
     def available(self) -> bool:
-        if not self.entity_description.survives_offline:
+        desc = self.entity_description
+        if not desc.survives_offline:
             return super().available
+        if desc.offline_value is not _UNSET:
+            return True
         data = self.coordinator.data
-        return data is not None and self.entity_description.value_fn(data) is not None
+        return data is not None and desc.value_fn(data) is not None
 
 
 class BoraMirrorSensor(BoraEntity, SensorEntity):
