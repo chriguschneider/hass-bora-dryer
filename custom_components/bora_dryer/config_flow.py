@@ -15,13 +15,16 @@ from homeassistant.config_entries import (
     ConfigFlowResult,
     OptionsFlow,
 )
+from homeassistant.components.sensor import SensorDeviceClass
 from homeassistant.const import CONF_HOST, CONF_NAME, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import selector
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .const import (
+    CONF_ENERGY_SENSOR,
     CONF_FILTER_DUE_HOURS,
+    CONF_POWER_SENSOR,
     CONF_POWER_SWITCH,
     DEFAULT_FILTER_DUE_HOURS,
     DEFAULT_HOST,
@@ -121,8 +124,9 @@ class BoraOptionsFlow(OptionsFlow):
         if user_input is not None:
             cleaned = dict(user_input)
             # Empty selector value means "unset" — drop it so it doesn't shadow.
-            if not cleaned.get(CONF_POWER_SWITCH):
-                cleaned.pop(CONF_POWER_SWITCH, None)
+            for key in (CONF_POWER_SWITCH, CONF_POWER_SENSOR, CONF_ENERGY_SENSOR):
+                if not cleaned.get(key):
+                    cleaned.pop(key, None)
             return self.async_create_entry(title="", data=cleaned)
 
         current = self.config_entry.options
@@ -134,6 +138,24 @@ class BoraOptionsFlow(OptionsFlow):
                 ): selector.EntitySelector(
                     selector.EntitySelectorConfig(
                         domain=Platform.SWITCH.value,
+                    )
+                ),
+                vol.Optional(
+                    CONF_POWER_SENSOR,
+                    description={"suggested_value": current.get(CONF_POWER_SENSOR)},
+                ): selector.EntitySelector(
+                    selector.EntitySelectorConfig(
+                        domain=Platform.SENSOR.value,
+                        device_class=SensorDeviceClass.POWER,
+                    )
+                ),
+                vol.Optional(
+                    CONF_ENERGY_SENSOR,
+                    description={"suggested_value": current.get(CONF_ENERGY_SENSOR)},
+                ): selector.EntitySelector(
+                    selector.EntitySelectorConfig(
+                        domain=Platform.SENSOR.value,
+                        device_class=SensorDeviceClass.ENERGY,
                     )
                 ),
                 vol.Required(

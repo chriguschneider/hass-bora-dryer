@@ -59,6 +59,9 @@ another model, please open an issue with the contents of `/info.html`.
 
 ## Changelog
 
+- **v0.3.1** — Optional power & energy mirror sensors. Pick the upstream
+  Shelly's power and energy entities in the integration's options and they
+  appear under the BORA device alongside the existing entities.
 - **v0.3.0** — BORA device is shown as *connected via* the upstream power
   switch device (e.g. a Shelly), once that switch is configured in the
   integration's options.

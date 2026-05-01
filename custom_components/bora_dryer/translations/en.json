@@ -22,9 +22,11 @@
     "step": {
       "init": {
         "title": "BORA options",
-        "description": "Optional: attach a smart-plug switch entity (e.g. a Shelly in front of the dryer) to expose a 'Power' switch on the BORA device. The BORA itself has no remote on/off — this delegates to the underlying entity.",
+        "description": "Optional: attach upstream entities from a smart plug (e.g. a Shelly in front of the dryer). The switch enables a 'Power' control on the BORA device; the power and energy sensors are mirrored under the BORA device for unified history and dashboards.",
         "data": {
           "power_switch_entity_id": "Power switch entity (optional)",
+          "power_sensor_entity_id": "Power sensor entity (optional)",
+          "energy_sensor_entity_id": "Energy sensor entity (optional)",
           "filter_due_hours": "Filter maintenance threshold (hours)"
         }
       }
@@ -52,6 +54,12 @@
       },
       "firmware_version": {
         "name": "Firmware version"
+      },
+      "power": {
+        "name": "Power"
+      },
+      "energy": {
+        "name": "Energy"
       }
     },
     "binary_sensor": {

@@ -22,9 +22,11 @@
     "step": {
       "init": {
         "title": "BORA Optionen",
-        "description": "Optional: Verknüpfe eine Switch-Entity (z.B. ein Shelly vor dem Trockner) um auf dem BORA-Gerät einen 'Power'-Switch anzuzeigen. Der BORA selbst hat kein Remote-On/Off — der Switch delegiert an die gewählte Entity.",
+        "description": "Optional: Verknüpfe Entitäten eines vorgeschalteten Smart-Plugs (z.B. eines Shelly). Der Switch aktiviert auf dem BORA-Gerät einen 'Power'-Schalter; die Leistungs- und Energie-Sensoren werden unter dem BORA-Gerät gespiegelt für einheitliche Historie und Dashboards.",
         "data": {
           "power_switch_entity_id": "Power-Switch Entity (optional)",
+          "power_sensor_entity_id": "Leistungs-Sensor Entity (optional)",
+          "energy_sensor_entity_id": "Energie-Sensor Entity (optional)",
           "filter_due_hours": "Schwellwert Filter-Wartung (Stunden)"
         }
       }
@@ -52,6 +54,12 @@
       },
       "firmware_version": {
         "name": "Firmware-Version"
+      },
+      "power": {
+        "name": "Leistung"
+      },
+      "energy": {
+        "name": "Energie"
       }
     },
     "binary_sensor": {

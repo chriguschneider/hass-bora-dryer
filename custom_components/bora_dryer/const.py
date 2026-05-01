@@ -19,6 +19,8 @@ MAX_FILTER_DUE_HOURS = 300
 
 # Options keys
 CONF_POWER_SWITCH = "power_switch_entity_id"
+CONF_POWER_SENSOR = "power_sensor_entity_id"
+CONF_ENERGY_SENSOR = "energy_sensor_entity_id"
 CONF_FILTER_DUE_HOURS = "filter_due_hours"
 
 # Camera caches the BMP→PNG conversion for this long.
