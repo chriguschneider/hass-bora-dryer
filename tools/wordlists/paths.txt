@@ -1,0 +1,102 @@
+# Wordlist for tools/probe_endpoints.py
+# One base name per line. The script generates extension/case variations.
+# Lines starting with `#` and blank lines are ignored.
+# Lines that already contain `.` (e.g. STATUS.HTML) are used as-is, no expansion.
+
+# --- Sanity: known endpoints (must come back as-is) ---
+index.html
+status.html
+info.html
+lcd.html
+wifi.html
+software.html
+date.html
+
+# --- Generic embedded-device suspects ---
+settings
+config
+admin
+control
+command
+cmd
+api
+debug
+log
+logs
+stats
+error
+errors
+alarm
+alarms
+test
+factory
+reset
+network
+system
+boot
+version
+help
+menu
+home
+main
+default
+manual
+service
+
+# --- Domain-specific: dryer/HVAC vocabulary ---
+program
+programs
+cycle
+mode
+fan
+heat
+start
+stop
+run
+pause
+temp
+temperature
+humidity
+rh
+filter
+dryer
+power
+relay
+state
+operation
+sensor
+sensors
+
+# --- Pre-baked case variations of known paths (no expansion) ---
+STATUS.HTML
+Status.html
+INFO.HTML
+Info.html
+INDEX.HTML
+Index.html
+LCD.html
+DATE.HTML
+
+# --- Common cgi-bin / api prefixes (no expansion, used literally) ---
+cgi-bin/
+cgi-bin/index
+cgi-bin/status
+cgi-bin/control
+api/
+api/v1/
+api/status
+api/info
+api/control
+v1/
+v1/status
+
+# --- Misc curiosities ---
+robots.txt
+favicon.ico
+sitemap.xml
+.well-known/
+update.html
+upgrade.html
+flash.html
+fw.html
+firmware.html
