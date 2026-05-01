@@ -25,7 +25,7 @@ USER_SCHEMA = vol.Schema(
     }
 )
 
-RE_DEVICE_ID = re.compile(r">([0-9a-f]{8})<br>\s*\n*\s*V\d", re.IGNORECASE)
+RE_DEVICE_ID = re.compile(r"V\d+\.\d+\.\d+<br>\s*([0-9a-f]{8})<br>", re.IGNORECASE)
 RE_MODEL = re.compile(r"Bora\s+(\d+)")
 
 

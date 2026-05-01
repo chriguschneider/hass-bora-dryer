@@ -22,7 +22,7 @@ RE_HUMIDITY = re.compile(r"Present RH:\s*(\d+)\s*%")
 RE_OPERATION = re.compile(r"Present Operation:\s*([^<\n]+?)\s*<")
 RE_FILTER = re.compile(r"Filter\s*(\d+):(\d+)")
 RE_FIRMWARE = re.compile(r"V(\d+\.\d+\.\d+)")
-RE_DEVICE_ID = re.compile(r">([0-9a-f]{8})<br>\s*\n*\s*V\d", re.IGNORECASE)
+RE_DEVICE_ID = re.compile(r"V\d+\.\d+\.\d+<br>\s*([0-9a-f]{8})<br>", re.IGNORECASE)
 RE_MODEL = re.compile(r"Bora\s+(\d+)")
 
 
