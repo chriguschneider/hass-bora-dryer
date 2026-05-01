@@ -18,6 +18,18 @@
       "already_configured": "Dieser BORA ist bereits eingerichtet."
     }
   },
+  "options": {
+    "step": {
+      "init": {
+        "title": "BORA Optionen",
+        "description": "Optional: Verknüpfe eine Switch-Entity (z.B. ein Shelly vor dem Trockner) um auf dem BORA-Gerät einen 'Power'-Switch anzuzeigen. Der BORA selbst hat kein Remote-On/Off — der Switch delegiert an die gewählte Entity.",
+        "data": {
+          "power_switch_entity_id": "Power-Switch Entity (optional)",
+          "filter_due_hours": "Schwellwert Filter-Wartung (Stunden)"
+        }
+      }
+    }
+  },
   "entity": {
     "sensor": {
       "temperature": {
@@ -32,6 +44,12 @@
       "filter_hours": {
         "name": "Filter-Betriebsstunden"
       },
+      "filter_remaining_hours": {
+        "name": "Filter-Reststunden"
+      },
+      "filter_progress_percent": {
+        "name": "Filter-Auslastung"
+      },
       "firmware_version": {
         "name": "Firmware-Version"
       }
@@ -42,6 +60,21 @@
       },
       "filter_due": {
         "name": "Filter-Wartung fällig"
+      }
+    },
+    "switch": {
+      "power": {
+        "name": "Power"
+      }
+    },
+    "button": {
+      "set_clock": {
+        "name": "Uhrzeit aus Home Assistant übernehmen"
+      }
+    },
+    "camera": {
+      "lcd": {
+        "name": "Display"
       }
     }
   }

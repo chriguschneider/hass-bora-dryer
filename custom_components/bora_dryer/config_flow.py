@@ -9,12 +9,28 @@ from typing import Any
 import aiohttp
 import voluptuous as vol
 
-from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
-from homeassistant.const import CONF_HOST, CONF_NAME
-from homeassistant.core import HomeAssistant
+from homeassistant.config_entries import (
+    ConfigEntry,
+    ConfigFlow,
+    ConfigFlowResult,
+    OptionsFlow,
+)
+from homeassistant.const import CONF_HOST, CONF_NAME, Platform
+from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers import selector
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .const import DEFAULT_HOST, DEFAULT_NAME, DOMAIN, HTTP_TIMEOUT
+from .const import (
+    CONF_FILTER_DUE_HOURS,
+    CONF_POWER_SWITCH,
+    DEFAULT_FILTER_DUE_HOURS,
+    DEFAULT_HOST,
+    DEFAULT_NAME,
+    DOMAIN,
+    HTTP_TIMEOUT,
+    MAX_FILTER_DUE_HOURS,
+    MIN_FILTER_DUE_HOURS,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -88,3 +104,53 @@ class BoraConfigFlow(ConfigFlow, domain=DOMAIN):
             data_schema=USER_SCHEMA,
             errors=errors,
         )
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:
+        """Return the options flow handler."""
+        return BoraOptionsFlow()
+
+
+class BoraOptionsFlow(OptionsFlow):
+    """Lets the user attach a power-switch entity and tune the filter threshold."""
+
+    async def async_step_init(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        if user_input is not None:
+            cleaned = dict(user_input)
+            # Empty selector value means "unset" — drop it so it doesn't shadow.
+            if not cleaned.get(CONF_POWER_SWITCH):
+                cleaned.pop(CONF_POWER_SWITCH, None)
+            return self.async_create_entry(title="", data=cleaned)
+
+        current = self.config_entry.options
+        schema = vol.Schema(
+            {
+                vol.Optional(
+                    CONF_POWER_SWITCH,
+                    description={"suggested_value": current.get(CONF_POWER_SWITCH)},
+                ): selector.EntitySelector(
+                    selector.EntitySelectorConfig(
+                        domain=Platform.SWITCH.value,
+                    )
+                ),
+                vol.Required(
+                    CONF_FILTER_DUE_HOURS,
+                    default=current.get(
+                        CONF_FILTER_DUE_HOURS, DEFAULT_FILTER_DUE_HOURS
+                    ),
+                ): selector.NumberSelector(
+                    selector.NumberSelectorConfig(
+                        min=MIN_FILTER_DUE_HOURS,
+                        max=MAX_FILTER_DUE_HOURS,
+                        step=1,
+                        mode=selector.NumberSelectorMode.SLIDER,
+                        unit_of_measurement="h",
+                    )
+                ),
+            }
+        )
+
+        return self.async_show_form(step_id="init", data_schema=schema)

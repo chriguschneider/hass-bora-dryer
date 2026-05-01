@@ -16,7 +16,7 @@ from homeassistant.const import PERCENTAGE, EntityCategory, UnitOfTemperature, U
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import DOMAIN
+from .const import DOMAIN, FILTER_LIFETIME_HOURS
 from .coordinator import BoraDataUpdateCoordinator
 from .entity import BoraEntity
 
@@ -26,6 +26,21 @@ class BoraSensorEntityDescription(SensorEntityDescription):
     """Sensor description with a value extractor."""
 
     value_fn: Callable[[dict[str, Any]], Any]
+
+
+def _filter_remaining(data: dict[str, Any]) -> int | None:
+    hours = data.get("filter_hours")
+    if hours is None:
+        return None
+    return max(FILTER_LIFETIME_HOURS - hours, 0)
+
+
+def _filter_progress_percent(data: dict[str, Any]) -> int | None:
+    hours = data.get("filter_hours")
+    if hours is None:
+        return None
+    pct = round(hours / FILTER_LIFETIME_HOURS * 100)
+    return max(0, min(100, pct))
 
 
 SENSORS: tuple[BoraSensorEntityDescription, ...] = (
@@ -59,6 +74,20 @@ SENSORS: tuple[BoraSensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfTime.HOURS,
         icon="mdi:air-filter",
         value_fn=lambda d: d.get("filter_hours"),
+    ),
+    BoraSensorEntityDescription(
+        key="filter_remaining_hours",
+        translation_key="filter_remaining_hours",
+        native_unit_of_measurement=UnitOfTime.HOURS,
+        icon="mdi:timer-sand",
+        value_fn=_filter_remaining,
+    ),
+    BoraSensorEntityDescription(
+        key="filter_progress_percent",
+        translation_key="filter_progress_percent",
+        native_unit_of_measurement=PERCENTAGE,
+        icon="mdi:gauge",
+        value_fn=_filter_progress_percent,
     ),
     BoraSensorEntityDescription(
         key="firmware_version",

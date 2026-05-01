@@ -18,6 +18,18 @@
       "already_configured": "This BORA is already configured."
     }
   },
+  "options": {
+    "step": {
+      "init": {
+        "title": "BORA options",
+        "description": "Optional: attach a smart-plug switch entity (e.g. a Shelly in front of the dryer) to expose a 'Power' switch on the BORA device. The BORA itself has no remote on/off — this delegates to the underlying entity.",
+        "data": {
+          "power_switch_entity_id": "Power switch entity (optional)",
+          "filter_due_hours": "Filter maintenance threshold (hours)"
+        }
+      }
+    }
+  },
   "entity": {
     "sensor": {
       "temperature": {
@@ -32,6 +44,12 @@
       "filter_hours": {
         "name": "Filter operating hours"
       },
+      "filter_remaining_hours": {
+        "name": "Filter remaining hours"
+      },
+      "filter_progress_percent": {
+        "name": "Filter usage"
+      },
       "firmware_version": {
         "name": "Firmware version"
       }
@@ -42,6 +60,21 @@
       },
       "filter_due": {
         "name": "Filter maintenance due"
+      }
+    },
+    "switch": {
+      "power": {
+        "name": "Power"
+      }
+    },
+    "button": {
+      "set_clock": {
+        "name": "Set clock from Home Assistant"
+      }
+    },
+    "camera": {
+      "lcd": {
+        "name": "Display"
       }
     }
   }

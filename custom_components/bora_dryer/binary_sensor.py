@@ -14,7 +14,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import DOMAIN, FILTER_DUE_HOURS
+from .const import CONF_FILTER_DUE_HOURS, DEFAULT_FILTER_DUE_HOURS, DOMAIN
 from .coordinator import BoraDataUpdateCoordinator
 from .entity import BoraEntity
 
@@ -23,21 +23,24 @@ from .entity import BoraEntity
 class BoraBinarySensorEntityDescription(BinarySensorEntityDescription):
     """Binary sensor description with a value extractor."""
 
-    value_fn: Callable[[dict[str, Any]], bool | None]
+    value_fn: Callable[[BoraDataUpdateCoordinator], bool | None]
 
 
-def _is_drying(data: dict[str, Any]) -> bool | None:
-    op = data.get("operation_state")
+def _is_drying(coordinator: BoraDataUpdateCoordinator) -> bool | None:
+    op = (coordinator.data or {}).get("operation_state")
     if op is None:
         return None
     return "Drying" in op
 
 
-def _filter_due(data: dict[str, Any]) -> bool | None:
-    hours = data.get("filter_hours")
+def _filter_due(coordinator: BoraDataUpdateCoordinator) -> bool | None:
+    hours = (coordinator.data or {}).get("filter_hours")
     if hours is None:
         return None
-    return hours >= FILTER_DUE_HOURS
+    threshold = coordinator.entry.options.get(
+        CONF_FILTER_DUE_HOURS, DEFAULT_FILTER_DUE_HOURS
+    )
+    return hours >= threshold
 
 
 BINARY_SENSORS: tuple[BoraBinarySensorEntityDescription, ...] = (
@@ -83,4 +86,4 @@ class BoraBinarySensor(BoraEntity, BinarySensorEntity):
 
     @property
     def is_on(self) -> bool | None:
-        return self.entity_description.value_fn(self.coordinator.data or {})
+        return self.entity_description.value_fn(self.coordinator)
