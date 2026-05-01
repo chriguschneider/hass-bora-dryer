@@ -1,0 +1,48 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "BORA Raumluft-Wäschetrockner",
+        "description": "Verbinde dich mit deinem Roth-Kippe BORA Wäschetrockner im lokalen Netzwerk. Die IP-Adresse muss von Home Assistant aus erreichbar sein.",
+        "data": {
+          "host": "Host oder IP-Adresse",
+          "name": "Name"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung fehlgeschlagen. Bitte Host/IP prüfen und sicherstellen dass der BORA eingeschaltet ist.",
+      "not_a_bora": "Das Gerät antwortet, sieht aber nicht nach einem BORA-Trockner aus."
+    },
+    "abort": {
+      "already_configured": "Dieser BORA ist bereits eingerichtet."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "temperature": {
+        "name": "Temperatur"
+      },
+      "humidity": {
+        "name": "Luftfeuchte"
+      },
+      "operation_state": {
+        "name": "Betriebszustand"
+      },
+      "filter_hours": {
+        "name": "Filter-Betriebsstunden"
+      },
+      "firmware_version": {
+        "name": "Firmware-Version"
+      }
+    },
+    "binary_sensor": {
+      "is_drying": {
+        "name": "Trocknet"
+      },
+      "filter_due": {
+        "name": "Filter-Wartung fällig"
+      }
+    }
+  }
+}

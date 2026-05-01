@@ -1,0 +1,12 @@
+{
+  "domain": "bora_dryer",
+  "name": "BORA Raumluft-Wäschetrockner",
+  "version": "0.1.0",
+  "config_flow": true,
+  "iot_class": "local_polling",
+  "integration_type": "device",
+  "documentation": "https://github.com/chrigu/hass-bora-dryer",
+  "issue_tracker": "https://github.com/chrigu/hass-bora-dryer/issues",
+  "codeowners": ["@chrigu"],
+  "requirements": []
+}

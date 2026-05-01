@@ -1,0 +1,48 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "BORA Raumluft-Wäschetrockner",
+        "description": "Connect to a Roth-Kippe BORA dryer on your local network. The IP address must be reachable from Home Assistant.",
+        "data": {
+          "host": "Host or IP address",
+          "name": "Name"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect. Check the host/IP and that the BORA is powered on.",
+      "not_a_bora": "Device responded but does not appear to be a BORA dryer."
+    },
+    "abort": {
+      "already_configured": "This BORA is already configured."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "temperature": {
+        "name": "Temperature"
+      },
+      "humidity": {
+        "name": "Humidity"
+      },
+      "operation_state": {
+        "name": "Operation"
+      },
+      "filter_hours": {
+        "name": "Filter operating hours"
+      },
+      "firmware_version": {
+        "name": "Firmware version"
+      }
+    },
+    "binary_sensor": {
+      "is_drying": {
+        "name": "Drying"
+      },
+      "filter_due": {
+        "name": "Filter maintenance due"
+      }
+    }
+  }
+}
