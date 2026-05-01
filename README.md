@@ -59,6 +59,11 @@ another model, please open an issue with the contents of `/info.html`.
 
 ## Changelog
 
+- **v0.4.0** — Built-in filter-maintenance repair issue. The integration
+  now raises a Home Assistant repair issue (Settings → Repairs) when filter
+  operating hours exceed the configured threshold; it clears automatically
+  once the filter is reset on the device. Removes the need for an external
+  YAML automation to surface filter maintenance.
 - **v0.3.2** — Setup tolerates an offline device (e.g. when the upstream
   Shelly has cut power). Entities are registered with state `unavailable`
   instead of failing to load entirely until the device is reachable. Closes

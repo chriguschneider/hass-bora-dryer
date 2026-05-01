@@ -10,10 +10,19 @@ import aiohttp
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .const import DOMAIN, HTTP_TIMEOUT, SCAN_INTERVAL
+from .const import (
+    CONF_FILTER_DUE_HOURS,
+    DEFAULT_FILTER_DUE_HOURS,
+    DOMAIN,
+    HTTP_TIMEOUT,
+    SCAN_INTERVAL,
+)
+
+FILTER_ISSUE_ID = "filter_maintenance_due"
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -105,4 +114,30 @@ class BoraDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         if missing:
             _LOGGER.debug("BORA fields not parsed this cycle: %s", missing)
 
+        self._update_filter_issue(data)
         return data
+
+    def _update_filter_issue(self, data: dict[str, Any]) -> None:
+        """Raise / clear the HA repair issue for filter maintenance."""
+        hours = data.get("filter_hours")
+        if hours is None:
+            return
+        threshold = self.entry.options.get(
+            CONF_FILTER_DUE_HOURS, DEFAULT_FILTER_DUE_HOURS
+        )
+        issue_id = f"{FILTER_ISSUE_ID}_{self.entry.entry_id}"
+        if hours >= threshold:
+            ir.async_create_issue(
+                self.hass,
+                DOMAIN,
+                issue_id,
+                is_fixable=False,
+                severity=ir.IssueSeverity.WARNING,
+                translation_key=FILTER_ISSUE_ID,
+                translation_placeholders={
+                    "hours": str(hours),
+                    "threshold": str(threshold),
+                },
+            )
+        else:
+            ir.async_delete_issue(self.hass, DOMAIN, issue_id)

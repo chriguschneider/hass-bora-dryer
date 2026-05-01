@@ -32,6 +32,12 @@
       }
     }
   },
+  "issues": {
+    "filter_maintenance_due": {
+      "title": "BORA: Filter-Wartung fällig",
+      "description": "Filter-Betriebsstunden: {hours} h (Schwellwert: {threshold} h). Filter reinigen oder ersetzen, danach am BORA-Display quittieren um den Zähler zurückzusetzen."
+    }
+  },
   "entity": {
     "sensor": {
       "temperature": {

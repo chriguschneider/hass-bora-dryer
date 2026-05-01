@@ -32,6 +32,12 @@
       }
     }
   },
+  "issues": {
+    "filter_maintenance_due": {
+      "title": "BORA: filter maintenance due",
+      "description": "Filter operating hours: {hours} h (threshold: {threshold} h). Clean or replace the filter, then acknowledge on the BORA's display to reset the counter."
+    }
+  },
   "entity": {
     "sensor": {
       "temperature": {
