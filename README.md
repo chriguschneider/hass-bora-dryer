@@ -31,7 +31,7 @@ smart plug (e.g. a Shelly PM in front of the dryer).
 
 1. Add this repository as a custom HACS repository:
    - Open HACS → ⋮ → **Custom repositories**
-   - URL: `https://github.com/chrigu/hass-bora-dryer`
+   - URL: `https://github.com/chriguschneider/hass-bora-dryer`
    - Category: `Integration`
 2. Install **BORA Raumluft-Wäschetrockner** from HACS and restart Home Assistant.
 3. Go to **Settings → Devices & Services → Add Integration → BORA

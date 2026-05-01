@@ -5,8 +5,8 @@
   "config_flow": true,
   "iot_class": "local_polling",
   "integration_type": "device",
-  "documentation": "https://github.com/chrigu/hass-bora-dryer",
-  "issue_tracker": "https://github.com/chrigu/hass-bora-dryer/issues",
-  "codeowners": ["@chrigu"],
+  "documentation": "https://github.com/chriguschneider/hass-bora-dryer",
+  "issue_tracker": "https://github.com/chriguschneider/hass-bora-dryer/issues",
+  "codeowners": ["@chriguschneider"],
   "requirements": []
 }
