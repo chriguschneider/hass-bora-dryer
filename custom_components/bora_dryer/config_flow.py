@@ -24,8 +24,10 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from .const import (
     CONF_ENERGY_SENSOR,
     CONF_FILTER_DUE_HOURS,
+    CONF_HUMIDITY_SENSOR,
     CONF_POWER_SENSOR,
     CONF_POWER_SWITCH,
+    CONF_TEMPERATURE_SENSOR,
     DEFAULT_FILTER_DUE_HOURS,
     DEFAULT_HOST,
     DEFAULT_NAME,
@@ -124,7 +126,13 @@ class BoraOptionsFlow(OptionsFlow):
         if user_input is not None:
             cleaned = dict(user_input)
             # Empty selector value means "unset" — drop it so it doesn't shadow.
-            for key in (CONF_POWER_SWITCH, CONF_POWER_SENSOR, CONF_ENERGY_SENSOR):
+            for key in (
+                CONF_POWER_SWITCH,
+                CONF_POWER_SENSOR,
+                CONF_ENERGY_SENSOR,
+                CONF_TEMPERATURE_SENSOR,
+                CONF_HUMIDITY_SENSOR,
+            ):
                 if not cleaned.get(key):
                     cleaned.pop(key, None)
             return self.async_create_entry(title="", data=cleaned)
@@ -156,6 +164,28 @@ class BoraOptionsFlow(OptionsFlow):
                     selector.EntitySelectorConfig(
                         domain=Platform.SENSOR.value,
                         device_class=SensorDeviceClass.ENERGY,
+                    )
+                ),
+                vol.Optional(
+                    CONF_TEMPERATURE_SENSOR,
+                    description={
+                        "suggested_value": current.get(CONF_TEMPERATURE_SENSOR)
+                    },
+                ): selector.EntitySelector(
+                    selector.EntitySelectorConfig(
+                        domain=Platform.SENSOR.value,
+                        device_class=SensorDeviceClass.TEMPERATURE,
+                    )
+                ),
+                vol.Optional(
+                    CONF_HUMIDITY_SENSOR,
+                    description={
+                        "suggested_value": current.get(CONF_HUMIDITY_SENSOR)
+                    },
+                ): selector.EntitySelector(
+                    selector.EntitySelectorConfig(
+                        domain=Platform.SENSOR.value,
+                        device_class=SensorDeviceClass.HUMIDITY,
                     )
                 ),
                 vol.Required(

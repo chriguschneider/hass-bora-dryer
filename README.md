@@ -12,8 +12,8 @@ Assistant entities, grouped under a single device.
 
 | Entity | Type | Notes |
 |---|---|---|
-| Temperature | sensor | °C, room/intake temperature |
-| Humidity | sensor | %, relative humidity measured by the BORA |
+| Temperature | sensor | °C, room/intake temperature (optional fallback to an external sensor when the BORA is offline) |
+| Humidity | sensor | %, relative humidity measured by the BORA (optional fallback to an external sensor when the BORA is offline) |
 | Operation | sensor | text: `Standby`, `Washing Drying`, ... |
 | Filter operating hours | sensor | hours since last filter reset |
 | Firmware version | sensor (diagnostic) | e.g. `V1.0.006` |
@@ -59,6 +59,11 @@ another model, please open an issue with the contents of `/info.html`.
 
 ## Changelog
 
+- **v0.6.0** — Optional temperature and humidity fallback sensors. Pick an
+  external temperature and/or humidity sensor in the integration's options
+  and the BORA's `Temperature` / `Humidity` entities keep reporting from
+  that source while the BORA itself is offline. When the BORA is online,
+  its own readings are still used.
 - **v0.5.1** — When the device is unreachable, `Operation` reports `Off`
   and `Drying` reports `false` instead of freezing on the last live value.
   This avoids stuck `Drying` readings when the user cuts power mid-cycle.

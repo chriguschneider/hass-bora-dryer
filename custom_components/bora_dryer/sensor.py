@@ -28,7 +28,9 @@ from homeassistant.helpers.event import async_track_state_change_event
 
 from .const import (
     CONF_ENERGY_SENSOR,
+    CONF_HUMIDITY_SENSOR,
     CONF_POWER_SENSOR,
+    CONF_TEMPERATURE_SENSOR,
     DOMAIN,
     FILTER_LIFETIME_HOURS,
 )
@@ -138,6 +140,15 @@ class BoraMirrorSensorDescription(SensorEntityDescription):
     options_key: str
 
 
+# Sensors that can fall back to an external entity when the BORA reading is
+# unavailable (device offline or value missing). Keyed by the sensor description
+# `key` so we look up the matching options entry at setup time.
+FALLBACK_SOURCES: dict[str, str] = {
+    "temperature": CONF_TEMPERATURE_SENSOR,
+    "humidity": CONF_HUMIDITY_SENSOR,
+}
+
+
 MIRROR_SENSORS: tuple[BoraMirrorSensorDescription, ...] = (
     BoraMirrorSensorDescription(
         key="power",
@@ -167,7 +178,14 @@ async def async_setup_entry(
 ) -> None:
     """Set up sensors for a BORA config entry."""
     coordinator: BoraDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
-    entities: list[SensorEntity] = [BoraSensor(coordinator, desc) for desc in SENSORS]
+    entities: list[SensorEntity] = []
+    for desc in SENSORS:
+        fallback_key = FALLBACK_SOURCES.get(desc.key)
+        source = entry.options.get(fallback_key) if fallback_key else None
+        if source:
+            entities.append(BoraFallbackSensor(coordinator, desc, source))
+        else:
+            entities.append(BoraSensor(coordinator, desc))
     for desc in MIRROR_SENSORS:
         source = entry.options.get(desc.options_key)
         if source:
@@ -210,6 +228,57 @@ class BoraSensor(BoraEntity, SensorEntity):
             return True
         data = self.coordinator.data
         return data is not None and desc.value_fn(data) is not None
+
+
+class BoraFallbackSensor(BoraSensor):
+    """BORA sensor that uses an external entity when the device value is unavailable."""
+
+    def __init__(
+        self,
+        coordinator: BoraDataUpdateCoordinator,
+        description: BoraSensorEntityDescription,
+        source_entity_id: str,
+    ) -> None:
+        super().__init__(coordinator, description)
+        self._source = source_entity_id
+
+    def _live_value(self) -> Any:
+        if not self.coordinator.last_update_success:
+            return None
+        return self.entity_description.value_fn(self.coordinator.data or {})
+
+    def _external_value(self) -> float | None:
+        state = self.hass.states.get(self._source)
+        if state is None or state.state in (STATE_UNAVAILABLE, STATE_UNKNOWN):
+            return None
+        try:
+            return float(state.state)
+        except (TypeError, ValueError):
+            return None
+
+    @property
+    def native_value(self) -> Any:
+        live = self._live_value()
+        if live is not None:
+            return live
+        return self._external_value()
+
+    @property
+    def available(self) -> bool:
+        return self._live_value() is not None or self._external_value() is not None
+
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+
+        @callback
+        def _state_changed(event: Event[EventStateChangedData]) -> None:
+            self.async_write_ha_state()
+
+        self.async_on_remove(
+            async_track_state_change_event(
+                self.hass, [self._source], _state_changed
+            )
+        )
 
 
 class BoraMirrorSensor(BoraEntity, SensorEntity):

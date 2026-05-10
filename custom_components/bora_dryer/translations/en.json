@@ -22,11 +22,13 @@
     "step": {
       "init": {
         "title": "BORA options",
-        "description": "Optional: attach upstream entities from a smart plug (e.g. a Shelly in front of the dryer). The switch enables a 'Power' control on the BORA device; the power and energy sensors are mirrored under the BORA device for unified history and dashboards.",
+        "description": "Optional: attach upstream entities from a smart plug (e.g. a Shelly in front of the dryer). The switch enables a 'Power' control on the BORA device; the power and energy sensors are mirrored under the BORA device for unified history and dashboards. The temperature and humidity fallback sensors are used when the BORA itself is offline, so the readings stay available while the device is powered down.",
         "data": {
           "power_switch_entity_id": "Power switch entity (optional)",
           "power_sensor_entity_id": "Power sensor entity (optional)",
           "energy_sensor_entity_id": "Energy sensor entity (optional)",
+          "temperature_sensor_entity_id": "Temperature fallback sensor (optional)",
+          "humidity_sensor_entity_id": "Humidity fallback sensor (optional)",
           "filter_due_hours": "Filter maintenance threshold (hours)"
         }
       }

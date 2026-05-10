@@ -22,11 +22,13 @@
     "step": {
       "init": {
         "title": "BORA Optionen",
-        "description": "Optional: Verknüpfe Entitäten eines vorgeschalteten Smart-Plugs (z.B. eines Shelly). Der Switch aktiviert auf dem BORA-Gerät einen 'Power'-Schalter; die Leistungs- und Energie-Sensoren werden unter dem BORA-Gerät gespiegelt für einheitliche Historie und Dashboards.",
+        "description": "Optional: Verknüpfe Entitäten eines vorgeschalteten Smart-Plugs (z.B. eines Shelly). Der Switch aktiviert auf dem BORA-Gerät einen 'Power'-Schalter; die Leistungs- und Energie-Sensoren werden unter dem BORA-Gerät gespiegelt für einheitliche Historie und Dashboards. Die Temperatur- und Feuchte-Fallback-Sensoren werden verwendet, wenn der BORA selbst offline ist — so bleiben die Werte auch bei ausgeschaltetem Gerät verfügbar.",
         "data": {
           "power_switch_entity_id": "Power-Switch Entity (optional)",
           "power_sensor_entity_id": "Leistungs-Sensor Entity (optional)",
           "energy_sensor_entity_id": "Energie-Sensor Entity (optional)",
+          "temperature_sensor_entity_id": "Temperatur-Fallback-Sensor (optional)",
+          "humidity_sensor_entity_id": "Feuchte-Fallback-Sensor (optional)",
           "filter_due_hours": "Schwellwert Filter-Wartung (Stunden)"
         }
       }
