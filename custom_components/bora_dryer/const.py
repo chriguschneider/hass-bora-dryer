@@ -24,6 +24,10 @@ CONF_ENERGY_SENSOR = "energy_sensor_entity_id"
 CONF_TEMPERATURE_SENSOR = "temperature_sensor_entity_id"
 CONF_HUMIDITY_SENSOR = "humidity_sensor_entity_id"
 CONF_FILTER_DUE_HOURS = "filter_due_hours"
+CONF_FILTER_NOTIFY = "filter_notify"
+
+# Whether to raise a persistent notification when the filter is due.
+DEFAULT_FILTER_NOTIFY = True
 
 # Camera caches the BMP→PNG conversion for this long.
 CAMERA_CACHE_SECONDS = 5

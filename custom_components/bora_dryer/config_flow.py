@@ -24,11 +24,13 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from .const import (
     CONF_ENERGY_SENSOR,
     CONF_FILTER_DUE_HOURS,
+    CONF_FILTER_NOTIFY,
     CONF_HUMIDITY_SENSOR,
     CONF_POWER_SENSOR,
     CONF_POWER_SWITCH,
     CONF_TEMPERATURE_SENSOR,
     DEFAULT_FILTER_DUE_HOURS,
+    DEFAULT_FILTER_NOTIFY,
     DEFAULT_HOST,
     DEFAULT_NAME,
     DOMAIN,
@@ -188,6 +190,12 @@ class BoraOptionsFlow(OptionsFlow):
                         device_class=SensorDeviceClass.HUMIDITY,
                     )
                 ),
+                vol.Required(
+                    CONF_FILTER_NOTIFY,
+                    default=current.get(
+                        CONF_FILTER_NOTIFY, DEFAULT_FILTER_NOTIFY
+                    ),
+                ): selector.BooleanSelector(),
                 vol.Required(
                     CONF_FILTER_DUE_HOURS,
                     default=current.get(

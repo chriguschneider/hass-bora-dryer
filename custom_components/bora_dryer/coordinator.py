@@ -8,21 +8,25 @@ from typing import Any
 
 import aiohttp
 
+from homeassistant.components import persistent_notification
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .const import (
     CONF_FILTER_DUE_HOURS,
+    CONF_FILTER_NOTIFY,
     DEFAULT_FILTER_DUE_HOURS,
+    DEFAULT_FILTER_NOTIFY,
     DOMAIN,
     HTTP_TIMEOUT,
     SCAN_INTERVAL,
 )
 
+# Legacy repair-issue id, kept only so __init__ can clear it on upgrade.
 FILTER_ISSUE_ID = "filter_maintenance_due"
+FILTER_NOTIFICATION_ID = "bora_filter"
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -114,30 +118,50 @@ class BoraDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         if missing:
             _LOGGER.debug("BORA fields not parsed this cycle: %s", missing)
 
-        self._update_filter_issue(data)
+        self._update_filter_notification(data)
         return data
 
-    def _update_filter_issue(self, data: dict[str, Any]) -> None:
-        """Raise / clear the HA repair issue for filter maintenance."""
+    def _update_filter_notification(self, data: dict[str, Any]) -> None:
+        """Raise / clear the persistent notification for filter maintenance.
+
+        A filter reminder is real-world appliance maintenance, not a Home
+        Assistant health problem, so it belongs in the notification panel
+        rather than under Settings > System > Repairs.
+
+        The notification is only (re)created on the rising edge — the cycle
+        where filter hours first cross the threshold. Once it is showing, we do
+        not recreate it on later polls, so dismissing it keeps it dismissed
+        until the filter is actually reset on the device (the counter drops
+        below the threshold, then climbs back over it). Dismissing the
+        notification therefore acts as acknowledging the reminder. The counter
+        itself cannot be reset over the LAN — only on the device display.
+        """
         hours = data.get("filter_hours")
         if hours is None:
             return
         threshold = self.entry.options.get(
             CONF_FILTER_DUE_HOURS, DEFAULT_FILTER_DUE_HOURS
         )
-        issue_id = f"{FILTER_ISSUE_ID}_{self.entry.entry_id}"
-        if hours >= threshold:
-            ir.async_create_issue(
+        notify = self.entry.options.get(CONF_FILTER_NOTIFY, DEFAULT_FILTER_NOTIFY)
+        notification_id = f"{FILTER_NOTIFICATION_ID}_{self.entry.entry_id}"
+
+        if not notify or hours < threshold:
+            persistent_notification.async_dismiss(self.hass, notification_id)
+            return
+
+        # hours >= threshold and notifications enabled: fire only on the rising
+        # edge. A fresh coordinator (first poll, restart, options reload) has no
+        # previous reading, so it nags once — acceptable.
+        prev = (self.data or {}).get("filter_hours")
+        if prev is None or prev < threshold:
+            persistent_notification.async_create(
                 self.hass,
-                DOMAIN,
-                issue_id,
-                is_fixable=False,
-                severity=ir.IssueSeverity.WARNING,
-                translation_key=FILTER_ISSUE_ID,
-                translation_placeholders={
-                    "hours": str(hours),
-                    "threshold": str(threshold),
-                },
+                (
+                    f"Filter operating hours: {hours} h (threshold: {threshold} h). "
+                    "Clean or replace the filter, then acknowledge on the BORA's "
+                    "display to reset the counter. Dismiss this notification to "
+                    "silence the reminder until the next cycle."
+                ),
+                title=f"{self.entry.title}: filter maintenance due",
+                notification_id=notification_id,
             )
-        else:
-            ir.async_delete_issue(self.hass, DOMAIN, issue_id)

@@ -29,15 +29,10 @@
           "energy_sensor_entity_id": "Energie-Sensor Entity (optional)",
           "temperature_sensor_entity_id": "Temperatur-Fallback-Sensor (optional)",
           "humidity_sensor_entity_id": "Feuchte-Fallback-Sensor (optional)",
+          "filter_notify": "Filter-Wartungs-Benachrichtigung anzeigen",
           "filter_due_hours": "Schwellwert Filter-Wartung (Stunden)"
         }
       }
-    }
-  },
-  "issues": {
-    "filter_maintenance_due": {
-      "title": "BORA: Filter-Wartung fällig",
-      "description": "Filter-Betriebsstunden: {hours} h (Schwellwert: {threshold} h). Filter reinigen oder ersetzen, danach am BORA-Display quittieren um den Zähler zurückzusetzen."
     }
   },
   "entity": {

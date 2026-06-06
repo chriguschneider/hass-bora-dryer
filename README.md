@@ -59,6 +59,19 @@ another model, please open an issue with the contents of `/info.html`.
 
 ## Changelog
 
+- **v0.7.0** — Filter maintenance now surfaces as a **persistent notification**
+  (the notification panel) instead of a repair issue under Settings → System →
+  Repairs. A filter reminder is real-world appliance maintenance, not a Home
+  Assistant health problem, so the notification panel is the idiomatic channel
+  (this mirrors how the Dreame vacuum integration handles consumables). The
+  notification self-clears once the filter is reset on the device, and can be
+  turned off with the new *Show filter maintenance notification* option.
+  Dismissing the notification acknowledges the reminder — it stays gone until
+  the filter is reset on the device and the counter climbs over the threshold
+  again, so it does not re-nag on every poll. (The counter itself can only be
+  reset on the device display; the BORA exposes no LAN endpoint for it.) Any
+  leftover repair issue from earlier versions is removed automatically on
+  upgrade.
 - **v0.6.0** — Optional temperature and humidity fallback sensors. Pick an
   external temperature and/or humidity sensor in the integration's options
   and the BORA's `Temperature` / `Humidity` entities keep reporting from
@@ -74,11 +87,11 @@ another model, please open an issue with the contents of `/info.html`.
   `unavailable`. Temperature and humidity still go `unavailable`, since a
   stale reading would be misleading. Closes
   [#2](https://github.com/chriguschneider/hass-bora-dryer/issues/2).
-- **v0.4.0** — Built-in filter-maintenance repair issue. The integration
-  now raises a Home Assistant repair issue (Settings → Repairs) when filter
-  operating hours exceed the configured threshold; it clears automatically
-  once the filter is reset on the device. Removes the need for an external
-  YAML automation to surface filter maintenance.
+- **v0.4.0** — Built-in filter-maintenance reminder when filter operating
+  hours exceed the configured threshold; it clears automatically once the
+  filter is reset on the device. Removes the need for an external YAML
+  automation to surface filter maintenance. (Originally a repair issue;
+  changed to a persistent notification in v0.7.0.)
 - **v0.3.2** — Setup tolerates an offline device (e.g. when the upstream
   Shelly has cut power). Entities are registered with state `unavailable`
   instead of failing to load entirely until the device is reachable. Closes

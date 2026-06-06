@@ -29,15 +29,10 @@
           "energy_sensor_entity_id": "Energy sensor entity (optional)",
           "temperature_sensor_entity_id": "Temperature fallback sensor (optional)",
           "humidity_sensor_entity_id": "Humidity fallback sensor (optional)",
+          "filter_notify": "Show filter maintenance notification",
           "filter_due_hours": "Filter maintenance threshold (hours)"
         }
       }
-    }
-  },
-  "issues": {
-    "filter_maintenance_due": {
-      "title": "BORA: filter maintenance due",
-      "description": "Filter operating hours: {hours} h (threshold: {threshold} h). Clean or replace the filter, then acknowledge on the BORA's display to reset the counter."
     }
   },
   "entity": {
