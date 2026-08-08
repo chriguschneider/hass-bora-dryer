@@ -206,8 +206,9 @@ to say thanks ❤️
 - 🐛 **Found a bug or want a feature?**
   [Open an issue](https://github.com/chriguschneider/hass-bora-dryer/issues/new).
 - 📣 **Own a BORA?** Sign the [petition](PETITION.md) for an open control API.
-- 💬 **Using it?** The Home Assistant community thread is the place to share
-  screenshots and setups (link in the repo description).
+- 💬 **Using it?** The
+  [Home Assistant community thread](https://community.home-assistant.io/t/bora-dryer-integration-bring-your-roth-kippe-bora-onto-your-dashboard-and-a-petition-for-control/1020437)
+  is the place to share screenshots and setups.
 
 ## Changelog
 

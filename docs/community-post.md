@@ -2,6 +2,8 @@ Title: BORA dryer integration — bring your Roth-Kippe BORA onto your dashboard
 
 Category: Share your Projects!
 
+Posted 2026-08-08: <https://community.home-assistant.io/t/bora-dryer-integration-bring-your-roth-kippe-bora-onto-your-dashboard-and-a-petition-for-control/1020437>
+
 ---
 
 Hi everyone,
