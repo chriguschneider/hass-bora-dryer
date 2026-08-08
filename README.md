@@ -155,6 +155,10 @@ Or manually:
 Setup only asks for the dryer's host/IP. Everything else lives in the
 integration's **Configure** dialog (optional):
 
+<p align="center">
+  <img src="images/options-dialog.png" alt="The BORA options dialog — smart plug entities, fallback sensors and the filter reminder settings" width="480" />
+</p>
+
 - **Power switch entity** — a smart plug in front of the dryer; adds the `Power`
   switch on the BORA device.
 - **Power / Energy sensors** — mirror the plug's readings under the BORA device

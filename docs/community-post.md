@@ -36,6 +36,22 @@ Home Assistant entities, all grouped under one device:
 
 Everything is **local**: no cloud, no account, no vendor server in the loop.
 
+**Wrap your smart plug (Shelly & friends)**
+
+If you already have a smart plug in front of the dryer — a Shelly PM, for
+example — the integration's options let you attach it to the BORA device:
+
+![The BORA options dialog — smart plug entities, fallback sensors and the filter reminder settings](https://raw.githubusercontent.com/chriguschneider/hass-bora-dryer/master/images/options-dialog.png)
+
+- The plug's **switch** becomes a `Power` control on the BORA device — one place
+  to cut and restore power.
+- Its **power and energy sensors** are mirrored under the BORA device, so
+  consumption history lives with the dryer instead of with the plug.
+- **Temperature / humidity fallback sensors** keep the room climate readings
+  alive while the BORA itself is powered down.
+- The **filter maintenance reminder** (threshold and on/off) is configured here
+  too.
+
 **The honest catch**
 
 The BORA's interface is **read-only**. You can't start/stop a program or reset the
