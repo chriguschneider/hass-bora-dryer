@@ -14,6 +14,10 @@ onto your dashboard.
 
 ![The BORA device page in Home Assistant while drying — sensors, controls, LCD mirror and activity log](https://raw.githubusercontent.com/chriguschneider/hass-bora-dryer/master/images/device-page.png)
 
+> 📣 **BORA owners:** there's a [petition asking Roth-Kippe for an open local
+> control API](https://github.com/chriguschneider/hass-bora-dryer/issues/4) —
+> one 👍 on the pinned issue is your signature. Details below.
+
 **What it gives you**
 
 It reads the BORA's local status server every 60 seconds and turns it into proper
@@ -68,3 +72,8 @@ Feedback, bug reports and BORA screenshots very welcome — GitHub issues or rig
 in the thread.
 
 Repo: https://github.com/chriguschneider/hass-bora-dryer
+
+**P.S.** If you take one thing from this post: **👍 the
+[petition](https://github.com/chriguschneider/hass-bora-dryer/issues/4)** if you
+own a BORA. It costs ten seconds and it's the only lever we have for real
+start/stop control.

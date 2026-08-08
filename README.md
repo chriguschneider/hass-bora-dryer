@@ -26,6 +26,15 @@
   <a href="PETITION.md">Petition for an open API</a>
 </p>
 
+> [!IMPORTANT]
+> ### 📣 Own a BORA? Sign the petition!
+> The BORA's network interface is **read-only** — no remote start, no program
+> selection, no filter reset. We're asking Roth-Kippe for a small, documented
+> local control API so the BORA can start on solar surplus and behave like a
+> real smart appliance.
+> **One 👍 on the [pinned petition issue](https://github.com/chriguschneider/hass-bora-dryer/issues/4) is your signature.**
+> Details and the open letter: [PETITION.md](PETITION.md) · [Why this matters ↓](#help-us-get-an-open-interface)
+
 A local-polling Home Assistant integration for the **Roth-Kippe BORA 4xx**
 [Raumluft-Wäschetrockner](https://www.roth-kippe.ch/waeschetrockner) — Swiss-made
 heat-pump room-air laundry dryers. It reads the dryer's built-in WLAN status
@@ -43,11 +52,11 @@ dashboard instead of on the machine's display in the basement.
 - [What this integration does](#what-this-integration-does)
 - [Entities](#entities)
 - [What it does *not* do (and why)](#what-it-does-not-do-and-why)
+- [Help us get an open interface](#help-us-get-an-open-interface)
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Security note](#security-note)
 - [Supported models](#supported-models)
-- [Help us get an open interface](#help-us-get-an-open-interface)
 - [AI-assisted development](#ai-assisted-development)
 - [Community](#community)
 - [Changelog](#changelog)
@@ -109,6 +118,20 @@ controller — it toggles a smart plug you place in front of the machine (e.g. a
 Shelly PM). That's the honest state of the art today, and it's exactly what the
 [petition](#help-us-get-an-open-interface) below is trying to change.
 
+## Help us get an open interface
+
+This integration can only *read* the dryer, because that's all Roth-Kippe
+currently allows over the network. A documented local control API — start/stop,
+program selection, filter reset — would let the BORA do what a modern appliance
+should: start on solar surplus, pause on a time-of-use tariff, and reset its
+filter counter without a trip to the basement.
+
+**If you own a BORA, add your voice:** a 👍 on the pinned
+**[petition issue](https://github.com/chriguschneider/hass-bora-dryer/issues/4)**
+is one more owner telling Roth-Kippe that an open interface matters. Background
+and the full open letter are in **[PETITION.md](PETITION.md)**. The more owners
+sign, the stronger the case.
+
 ## Installation
 
 ### HACS (custom repository)
@@ -159,20 +182,6 @@ the whole **BORA 4xx** series (408 / 410 / 415 / 420), which share the same
 controller. Running a different model? Please
 [open an issue](https://github.com/chriguschneider/hass-bora-dryer/issues/new)
 with the contents of `http://<your-bora-ip>/info.html` so it can be confirmed.
-
-## Help us get an open interface
-
-This integration can only *read* the dryer, because that's all Roth-Kippe
-currently allows over the network. A documented local control API — start/stop,
-program selection, filter reset — would let the BORA do what a modern appliance
-should: start on solar surplus, pause on a time-of-use tariff, and reset its
-filter counter without a trip to the basement.
-
-**If you own a BORA, add your voice:** a 👍 on the pinned
-**[petition issue](https://github.com/chriguschneider/hass-bora-dryer/issues/4)**
-is one more owner telling Roth-Kippe that an open interface matters. Background
-and the full open letter are in **[PETITION.md](PETITION.md)**. The more owners
-sign, the stronger the case.
 
 ## AI-assisted development
 
