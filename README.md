@@ -210,6 +210,11 @@ to say thanks ❤️
 <details>
 <summary>Version history</summary>
 
+- **v0.7.1** — Documentation release, no functional changes: fully redesigned
+  README (logo, badges, entity table, device-page screenshot), new
+  **[petition for an open local API](PETITION.md)** with signature collection on
+  [pinned issue #4](https://github.com/chriguschneider/hass-bora-dryer/issues/4),
+  and a draft for the Home Assistant community post.
 - **v0.7.0** — Filter maintenance now surfaces as a **persistent notification**
   instead of a repair issue under Settings → System → Repairs. A filter reminder
   is real-world appliance maintenance, not a Home Assistant health problem, so
