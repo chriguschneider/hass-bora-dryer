@@ -23,17 +23,13 @@
   &nbsp;·&nbsp;
   <a href="https://github.com/chriguschneider/hass-bora-dryer/issues">Issues</a>
   &nbsp;·&nbsp;
-  <a href="PETITION.md">Petition for an open API</a>
+  <a href="#device-control-where-things-stand">Device control status</a>
 </p>
 
-> [!IMPORTANT]
-> ### 📣 Own a BORA? Sign the petition!
-> The BORA's network interface is **read-only** — no remote start, no program
-> selection, no filter reset. We're asking Roth-Kippe for a small, documented
-> local control API so the BORA can start on solar surplus and behave like a
-> real smart appliance.
-> **One 👍 on the [pinned petition issue](https://github.com/chriguschneider/hass-bora-dryer/issues/4) is your signature.**
-> Details and the open letter: [PETITION.md](PETITION.md) · [Why this matters ↓](#help-us-get-an-open-interface)
+> [!NOTE]
+> The BORA's network interface is **read-only by design** — no remote start, no
+> program selection, no filter reset. We're in an open dialogue with Roth-Kippe
+> about changing that; see [where things stand ↓](#device-control-where-things-stand).
 
 A local-polling Home Assistant integration for the **Roth-Kippe BORA 4xx**
 [Raumluft-Wäschetrockner](https://www.roth-kippe.ch/waeschetrockner) — Swiss-made
@@ -115,22 +111,29 @@ operation it exposes is setting the clock (used by the `Set clock` button).
 
 The `Power` switch in the table above does **not** talk to the dryer's
 controller — it toggles a smart plug you place in front of the machine (e.g. a
-Shelly PM). That's the honest state of the art today, and it's exactly what the
-[petition](#help-us-get-an-open-interface) below is trying to change.
+Shelly PM). That's the honest state of the art today, and it's what the
+[vendor dialogue](#device-control-where-things-stand) below is about.
 
-## Help us get an open interface
+## Device control: where things stand
 
-This integration can only *read* the dryer, because that's all Roth-Kippe
-currently allows over the network. A documented local control API — start/stop,
+This integration can only *read* the dryer, because that's all the BORA's
+firmware allows over the network. A documented local control API — start/stop,
 program selection, filter reset — would let the BORA do what a modern appliance
 should: start on solar surplus, pause on a time-of-use tariff, and reset its
 filter counter without a trip to the basement.
 
-**If you own a BORA, add your voice:** a 👍 on the pinned
-**[petition issue](https://github.com/chriguschneider/hass-bora-dryer/issues/4)**
-is one more owner telling Roth-Kippe that an open interface matters. Background
-and the full open letter are in **[PETITION.md](PETITION.md)**. The more owners
-sign, the stronger the case.
+**Roth-Kippe's position (August 2026):** we asked, and they answered. There is
+no control API today and no concrete Smart-Home roadmap — but the firmware is
+available to owners on request, and their engineering department considers
+extended functions *"theoretically solvable without replacing hardware"*. The
+conversation is ongoing and documented openly in
+**[issue #3](https://github.com/chriguschneider/hass-bora-dryer/issues/3)**.
+
+**Own a BORA and want control?** Leave a 👍 on
+**[issue #4](https://github.com/chriguschneider/hass-bora-dryer/issues/4)**,
+optionally with your model and firmware version. We pass those numbers on to
+Roth-Kippe as customer feedback — a roadmap needs demand, and this is how owners
+can show it.
 
 ## Installation
 
@@ -205,7 +208,9 @@ to say thanks ❤️
 
 - 🐛 **Found a bug or want a feature?**
   [Open an issue](https://github.com/chriguschneider/hass-bora-dryer/issues/new).
-- 📣 **Own a BORA?** Sign the [petition](PETITION.md) for an open control API.
+- 🙋 **Own a BORA and want control?** Add a 👍 on
+  [issue #4](https://github.com/chriguschneider/hass-bora-dryer/issues/4) — see
+  [where things stand](#device-control-where-things-stand).
 - 💬 **Using it?** The
   [Home Assistant community thread](https://community.home-assistant.io/t/bora-dryer-integration-bring-your-roth-kippe-bora-onto-your-dashboard-and-a-petition-for-control/1020437)
   is the place to share screenshots and setups.
@@ -216,10 +221,11 @@ to say thanks ❤️
 <summary>Version history</summary>
 
 - **v0.7.1** — Documentation release, no functional changes: fully redesigned
-  README (logo, badges, entity table, device-page screenshot), new
-  **[petition for an open local API](PETITION.md)** with signature collection on
-  [pinned issue #4](https://github.com/chriguschneider/hass-bora-dryer/issues/4),
-  and a draft for the Home Assistant community post.
+  README (logo, badges, entity table, device-page screenshot), a petition for an
+  open local API (since reworked into the owner interest list on
+  [issue #4](https://github.com/chriguschneider/hass-bora-dryer/issues/4) after
+  Roth-Kippe entered into dialogue), and a draft for the Home Assistant
+  community post.
 - **v0.7.0** — Filter maintenance now surfaces as a **persistent notification**
   instead of a repair issue under Settings → System → Repairs. A filter reminder
   is real-world appliance maintenance, not a Home Assistant health problem, so

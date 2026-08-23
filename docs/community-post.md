@@ -1,8 +1,13 @@
-Title: BORA dryer integration — bring your Roth-Kippe BORA onto your dashboard (and a petition for control)
+Title: BORA dryer integration — bring your Roth-Kippe BORA onto your dashboard
 
 Category: Share your Projects!
 
 Posted 2026-08-08: <https://community.home-assistant.io/t/bora-dryer-integration-bring-your-roth-kippe-bora-onto-your-dashboard-and-a-petition-for-control/1020437>
+
+Revised 2026-08-23: petition wording replaced by the vendor-dialogue status after
+Roth-Kippe replied (see issue #3). The live forum post still needs to be edited by
+hand to match this draft (title: drop "and a petition for control"; the two petition
+blocks; the P.S.).
 
 ---
 
@@ -16,9 +21,10 @@ onto your dashboard.
 
 ![The BORA device page in Home Assistant while drying — sensors, controls, LCD mirror and activity log](https://raw.githubusercontent.com/chriguschneider/hass-bora-dryer/master/images/device-page.png)
 
-> 📣 **BORA owners:** there's a [petition asking Roth-Kippe for an open local
-> control API](https://github.com/chriguschneider/hass-bora-dryer/issues/4) —
-> one 👍 on the pinned issue is your signature. Details below.
+> 🙋 **BORA owners:** Roth-Kippe is in dialogue with us about a local control
+> API. If you'd use one, a 👍 on
+> [issue #4](https://github.com/chriguschneider/hass-bora-dryer/issues/4) is how
+> we show them the demand. Details below.
 
 **What it gives you**
 
@@ -61,15 +67,21 @@ filter counter over the network — the manufacturer built the WLAN side purely 
 status mirror. The only write it exposes is setting the clock. So for now, on/off is
 done with a smart plug in front of the machine.
 
-Which brings me to a small ask 👇
+Which brings me to where control stands 👇
 
-**A petition for an open API**
+**Device control: the vendor dialogue**
 
 I think a modern heat-pump dryer should be able to *start on solar surplus* and
-*reset its own filter counter*. That needs Roth-Kippe to publish a tiny local control
-API. So there's a petition: if you own a BORA, a 👍 on the pinned GitHub issue tells
-them owners actually want this. The more names, the stronger the case.
-→ https://github.com/chriguschneider/hass-bora-dryer/issues/4
+*reset its own filter counter*. That needs Roth-Kippe to add a tiny local control
+API. I asked them — and they answered: no API today and no concrete roadmap, but the
+firmware is available to owners on request, and their engineers consider extended
+functions "theoretically solvable without replacing hardware". The whole exchange
+is documented openly in [issue #3](https://github.com/chriguschneider/hass-bora-dryer/issues/3).
+
+If you own a BORA and would use a control API, a 👍 on
+[issue #4](https://github.com/chriguschneider/hass-bora-dryer/issues/4) (optionally
+with your model + firmware version) is what I pass on to Roth-Kippe as customer
+feedback. A roadmap needs demand; this is how owners can show it.
 
 **Install**
 
@@ -91,7 +103,6 @@ in the thread.
 
 Repo: https://github.com/chriguschneider/hass-bora-dryer
 
-**P.S.** If you take one thing from this post: **👍 the
-[petition](https://github.com/chriguschneider/hass-bora-dryer/issues/4)** if you
-own a BORA. It costs ten seconds and it's the only lever we have for real
-start/stop control.
+**P.S.** If you own a BORA and want real start/stop control one day: a 👍 on
+[issue #4](https://github.com/chriguschneider/hass-bora-dryer/issues/4) takes ten
+seconds and goes straight into the conversation with Roth-Kippe.
