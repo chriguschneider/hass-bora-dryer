@@ -16,3 +16,6 @@ tools/probe_results/
 # Vendor firmware + manuals (received privately from Roth-Kippe; not redistributed)
 firmware/*.bin
 firmware/*.pdf
+
+# Capture-campaign output (may contain device data)
+tools/log_capture_results/
