@@ -128,6 +128,9 @@ available to owners on request, and their engineering department considers
 extended functions *"theoretically solvable without replacing hardware"*. The
 conversation is ongoing and documented openly in
 **[issue #3](https://github.com/chriguschneider/hass-bora-dryer/issues/3)**.
+In September 2026 they did send the current firmware (`V1.0.012`); a static
+read of the image confirms the web interface still has no control endpoint —
+details in [`firmware/README.md`](firmware/README.md).
 
 **Own a BORA and want control?** Leave a 👍 on
 **[issue #4](https://github.com/chriguschneider/hass-bora-dryer/issues/4)**,
@@ -182,9 +185,41 @@ design choice, not a configuration issue.
 **Recommendation:** put the BORA in an isolated IoT VLAN, or otherwise restrict
 which hosts on your LAN can reach it.
 
+## Firmware updates
+
+Roth-Kippe does not publish firmware, but sends the current file to owners on
+request — write to info@roth-kippe.ch with your model and current version
+(`sensor.<bora>_firmware_version`, or `http://<bora-ip>/info.html`). As of
+September 2026 the current release is **`WT05-V1.0.012.bin`**; the one-page
+instructions they attach are summarised here.
+
+1. Save the `.bin` on the device you'll use for the upload.
+2. Open `http://<bora-ip>/software.html` in a browser — over your normal LAN,
+   or via the dryer's own access point (**Settings → WIFI → Konfiguration**
+   on the display shows SSID, password and `192.168.4.1`).
+3. **Datei auswählen** → pick the `.bin` → **Start Upload**.
+4. A confirmation page appears, then the BORA reboots by itself. The
+   integration reports it unavailable for a minute and recovers on the next
+   poll.
+
+Things to know before you press *Start Upload*:
+
+- The upload is unauthenticated and there is no version or signature check in
+  the browser flow — double-check you picked the right file. Do it on your own
+  responsibility; if something goes wrong, Roth-Kippe support is the right
+  contact, not this repo.
+- The integration is tested on `V1.0.006`. A static read of the `V1.0.012`
+  image shows the pages it parses are unchanged (see
+  [`firmware/README.md`](firmware/README.md)), but that isn't a live test yet
+  — if your values disappear after an update, please open an issue with your
+  `info.html`.
+- V1.0.012 adds **no** control endpoint. Start/stop, program choice and filter
+  reset remain display-only.
+
 ## Supported models
 
-Tested on the **BORA 410** (firmware `V1.0.006`). It very likely works across
+Tested on the **BORA 410** (firmware `V1.0.006`; the `V1.0.012` image has
+been inspected statically, not run). It very likely works across
 the whole **BORA 4xx** series (408 / 410 / 415 / 420), which share the same
 controller. Running a different model? Please
 [open an issue](https://github.com/chriguschneider/hass-bora-dryer/issues/new)

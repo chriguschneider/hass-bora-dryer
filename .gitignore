@@ -12,3 +12,7 @@ venv/
 *.swp
 .DS_Store
 tools/probe_results/
+
+# Vendor firmware + manuals (received privately from Roth-Kippe; not redistributed)
+firmware/*.bin
+firmware/*.pdf
