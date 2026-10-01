@@ -51,9 +51,21 @@ class BoraLcdCamera(BoraEntity, Camera):
         self._cached_at: float = 0.0
         self._lock = asyncio.Lock()
 
+    @property
+    def available(self) -> bool:
+        # Stay available even when the device is unreachable so the Display
+        # reads as idle (device simply off) rather than "unavailable". No image
+        # is served while offline — see async_camera_image.
+        return True
+
     async def async_camera_image(
         self, width: int | None = None, height: int | None = None
     ) -> bytes | None:
+        if not self.coordinator.last_update_success:
+            # Device powered down / unreachable: there is no live LCD to mirror,
+            # so serve no image rather than a stale, misleadingly-lit screen.
+            self._cached_png = None
+            return None
         async with self._lock:
             now = time.monotonic()
             if (

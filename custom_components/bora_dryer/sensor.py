@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from homeassistant.components.sensor import (
+    RestoreSensor,
     SensorDeviceClass,
     SensorEntity,
     SensorEntityDescription,
@@ -46,8 +47,11 @@ class BoraSensorEntityDescription(SensorEntityDescription):
     """Sensor description with a value extractor."""
 
     value_fn: Callable[[dict[str, Any]], Any]
-    # When True, the entity stays available while the device is unreachable
-    # (filter wear, firmware version, last-known operation).
+    # When True, the entity keeps its last known value while the device is
+    # unreachable instead of going unavailable, and that value is restored from
+    # HA's state store on restart — so a cold start with the device off still
+    # shows the last reading rather than "unavailable" (filter wear, firmware
+    # version, last temperature/humidity, last-known operation).
     survives_offline: bool = False
     # When set (and survives_offline=True), this synthetic value is reported
     # while the device is unreachable instead of the last live value. Use for
@@ -80,6 +84,7 @@ SENSORS: tuple[BoraSensorEntityDescription, ...] = (
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         suggested_display_precision=1,
         value_fn=lambda d: d.get("temperature"),
+        survives_offline=True,
     ),
     BoraSensorEntityDescription(
         key="humidity",
@@ -88,6 +93,7 @@ SENSORS: tuple[BoraSensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=PERCENTAGE,
         value_fn=lambda d: d.get("humidity"),
+        survives_offline=True,
     ),
     BoraSensorEntityDescription(
         key="operation_state",
@@ -193,8 +199,14 @@ async def async_setup_entry(
     async_add_entities(entities)
 
 
-class BoraSensor(BoraEntity, SensorEntity):
-    """Sensor entity backed by the coordinator data dict."""
+class BoraSensor(BoraEntity, RestoreSensor):
+    """Sensor entity backed by the coordinator data dict.
+
+    For `survives_offline` descriptions the last value is remembered across the
+    device being unreachable *and* across a Home Assistant restart (restored
+    from the state store in `async_added_to_hass`), so the entity never falls
+    back to "unavailable" once it has reported at least once.
+    """
 
     entity_description: BoraSensorEntityDescription
 
@@ -207,6 +219,27 @@ class BoraSensor(BoraEntity, SensorEntity):
         self.entity_description = description
         unique_root = coordinator.entry.unique_id or coordinator.entry.data["host"]
         self._attr_unique_id = f"{unique_root}_{description.key}"
+        self._restored_value: Any = None
+
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+        if self.entity_description.survives_offline:
+            if (last := await self.async_get_last_sensor_data()) is not None:
+                self._restored_value = last.native_value
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        # Remember the newest good reading so it can be held while the device is
+        # offline, even if HA is not restarted in between.
+        if self.entity_description.survives_offline:
+            live = self._live_value()
+            if live is not None:
+                self._restored_value = live
+        super()._handle_coordinator_update()
+
+    def _live_value(self) -> Any:
+        """The current reading from the coordinator, or None if not present."""
+        return self.entity_description.value_fn(self.coordinator.data or {})
 
     @property
     def native_value(self) -> Any:
@@ -217,7 +250,12 @@ class BoraSensor(BoraEntity, SensorEntity):
             and not self.coordinator.last_update_success
         ):
             return desc.offline_value
-        return desc.value_fn(self.coordinator.data or {})
+        live = self._live_value()
+        if live is not None or not desc.survives_offline:
+            return live
+        # Device offline / not yet polled: hold the last known value, restored
+        # from the state store after a restart.
+        return self._restored_value
 
     @property
     def available(self) -> bool:
@@ -226,8 +264,7 @@ class BoraSensor(BoraEntity, SensorEntity):
             return super().available
         if desc.offline_value is not _UNSET:
             return True
-        data = self.coordinator.data
-        return data is not None and desc.value_fn(data) is not None
+        return self._live_value() is not None or self._restored_value is not None
 
 
 class BoraFallbackSensor(BoraSensor):
@@ -261,11 +298,20 @@ class BoraFallbackSensor(BoraSensor):
         live = self._live_value()
         if live is not None:
             return live
-        return self._external_value()
+        external = self._external_value()
+        if external is not None:
+            return external
+        # No live reading and no external fallback: hold the last known value
+        # (restored across restarts) rather than go unavailable.
+        return self._restored_value
 
     @property
     def available(self) -> bool:
-        return self._live_value() is not None or self._external_value() is not None
+        return (
+            self._live_value() is not None
+            or self._external_value() is not None
+            or self._restored_value is not None
+        )
 
     async def async_added_to_hass(self) -> None:
         await super().async_added_to_hass()

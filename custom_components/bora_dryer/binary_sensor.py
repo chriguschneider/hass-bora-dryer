@@ -11,8 +11,10 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntityDescription,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.const import STATE_OFF, STATE_ON
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.restore_state import RestoreEntity
 
 from .const import CONF_FILTER_DUE_HOURS, DEFAULT_FILTER_DUE_HOURS, DOMAIN
 from .coordinator import BoraDataUpdateCoordinator
@@ -78,8 +80,13 @@ async def async_setup_entry(
     async_add_entities(BoraBinarySensor(coordinator, desc) for desc in BINARY_SENSORS)
 
 
-class BoraBinarySensor(BoraEntity, BinarySensorEntity):
-    """Binary sensor entity backed by the coordinator data dict."""
+class BoraBinarySensor(BoraEntity, RestoreEntity, BinarySensorEntity):
+    """Binary sensor entity backed by the coordinator data dict.
+
+    `survives_offline` descriptions keep their last state while the device is
+    unreachable and restore it across a Home Assistant restart, so they never
+    fall back to "unavailable" once they have reported at least once.
+    """
 
     entity_description: BoraBinarySensorEntityDescription
 
@@ -92,6 +99,24 @@ class BoraBinarySensor(BoraEntity, BinarySensorEntity):
         self.entity_description = description
         unique_root = coordinator.entry.unique_id or coordinator.entry.data["host"]
         self._attr_unique_id = f"{unique_root}_{description.key}"
+        self._restored_is_on: bool | None = None
+
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+        if self.entity_description.survives_offline:
+            if (last := await self.async_get_last_state()) is not None:
+                if last.state in (STATE_ON, STATE_OFF):
+                    self._restored_is_on = last.state == STATE_ON
+
+    @callback
+    def _handle_coordinator_update(self) -> None:
+        # Remember the newest good state so it can be held while the device is
+        # offline, even if HA is not restarted in between.
+        if self.entity_description.survives_offline:
+            live = self.entity_description.value_fn(self.coordinator)
+            if live is not None:
+                self._restored_is_on = live
+        super()._handle_coordinator_update()
 
     @property
     def is_on(self) -> bool | None:
@@ -102,7 +127,12 @@ class BoraBinarySensor(BoraEntity, BinarySensorEntity):
             and not self.coordinator.last_update_success
         ):
             return desc.offline_value
-        return desc.value_fn(self.coordinator)
+        live = desc.value_fn(self.coordinator)
+        if live is not None or not desc.survives_offline:
+            return live
+        # Device offline / not yet polled: hold the last known state, restored
+        # from the state store after a restart.
+        return self._restored_is_on
 
     @property
     def available(self) -> bool:
@@ -111,6 +141,4 @@ class BoraBinarySensor(BoraEntity, BinarySensorEntity):
             return super().available
         if desc.offline_value is not _UNSET:
             return True
-        if self.coordinator.data is None:
-            return False
-        return desc.value_fn(self.coordinator) is not None
+        return desc.value_fn(self.coordinator) is not None or self._restored_is_on is not None

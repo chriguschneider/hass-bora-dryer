@@ -255,6 +255,14 @@ to say thanks ❤️
 <details>
 <summary>Version history</summary>
 
+- **v0.8.0** — Sensors and binary sensors no longer drop to **unavailable**
+  when the device is switched off. They hold their last reading, and — via
+  `RestoreEntity` — that value now also survives a **Home Assistant restart**,
+  so a cold start with the dryer off still shows the last known filter wear,
+  firmware, temperature and humidity instead of a row of "unavailable". The
+  `Display` camera stays available (reads as idle rather than unavailable) and
+  simply serves no image while the device is offline. Note: frozen
+  temperature/humidity show a flat line in history until the device is back.
 - **v0.7.1** — Documentation release, no functional changes: fully redesigned
   README (logo, badges, entity table, device-page screenshot), a petition for an
   open local API (since reworked into the owner interest list on
