@@ -105,6 +105,13 @@ jobs:
           # github-actions[bot] and their CI would sit in "action_required".
           persist-credentials: false
 
+
+      # The agent runs the repo's checks itself; without this the runner has
+      # only the system Python (no `python`, no `pip`, installs refused).
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        if: steps.token.outputs.present == 'true'
+        with:
+          python-version: "3.13"
       - name: Pick model
         id: model
         if: steps.token.outputs.present == 'true'
@@ -128,7 +135,7 @@ jobs:
             --model ${{ steps.model.outputs.model }}
             --max-turns 100
             --permission-mode dontAsk
-            --allowedTools "Read,Glob,Grep,Edit,Write,TodoWrite,Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git show*),Bash(git switch*),Bash(git checkout*),Bash(git branch*),Bash(git add*),Bash(git commit*),Bash(git push*),Bash(git rm*),Bash(git mv*),Bash(git restore*),Bash(git fetch*),Bash(git rev-parse*),Bash(ls*),Bash(gh issue view*),Bash(gh issue comment*),Bash(gh pr create*),Bash(gh pr view*),Bash(gh pr diff*),Bash(gh pr checks*),Bash(gh pr comment*),Bash(gh pr edit*),Bash(gh pr list*),Bash(pip install -r requirements_test.txt*),Bash(python -m pip install -r requirements_test.txt*),Bash(ruff check*),Bash(ruff format*),Bash(pytest*),Bash(python -m pytest*)"
+            --allowedTools "Read,Glob,Grep,Edit,Write,TodoWrite,Bash(git status*),Bash(git diff*),Bash(git log*),Bash(git show*),Bash(git switch*),Bash(git checkout*),Bash(git branch*),Bash(git add*),Bash(git commit*),Bash(git push*),Bash(git rm*),Bash(git mv*),Bash(git restore*),Bash(git fetch*),Bash(git rev-parse*),Bash(ls*),Bash(cd *),Bash(gh issue view*),Bash(gh issue comment*),Bash(gh pr create*),Bash(gh pr view*),Bash(gh pr diff*),Bash(gh pr checks*),Bash(gh pr comment*),Bash(gh pr edit*),Bash(gh pr list*),Bash(pip install -r requirements_test.txt*),Bash(python -m pip install -r requirements_test.txt*),Bash(ruff check*),Bash(ruff format*),Bash(pytest*),Bash(python -m pytest*),Bash(python3 -m pip install -r requirements_test.txt*),Bash(pip3 install -r requirements_test.txt*),Bash(python3 -m pytest*)"
           prompt: |
             You are working, unattended, on GitHub issue #${{ env.ISSUE }}
             of this repository. FIRST read AGENTS.md, docs/adr/ and docs/upstream.md (if it
