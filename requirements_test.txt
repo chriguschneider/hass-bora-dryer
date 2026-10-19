@@ -1,0 +1,6 @@
+ruff
+pytest
+pytest-homeassistant-custom-component
+# Home Assistant's camera component imports it; HA installs it at runtime,
+# the test harness does not (this integration has a camera platform).
+PyTurboJPEG
