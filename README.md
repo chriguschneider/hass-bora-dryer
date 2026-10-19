@@ -10,7 +10,7 @@
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/github/license/chriguschneider/hass-bora-dryer?color=yellow" /></a>
   <a href="https://hacs.xyz/"><img alt="HACS Custom" src="https://img.shields.io/badge/HACS-Custom-orange.svg" /></a>
   <a href="https://github.com/chriguschneider/hass-bora-dryer/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/chriguschneider/hass-bora-dryer" /></a>
-  <a href="https://github.com/chriguschneider/hass-bora-dryer/actions/workflows/validate.yml"><img alt="Validate status" src="https://img.shields.io/github/actions/workflow/status/chriguschneider/hass-bora-dryer/validate.yml?label=validate" /></a>
+  <a href="https://github.com/chriguschneider/hass-bora-dryer/actions/workflows/ci.yml"><img alt="CI status" src="https://img.shields.io/github/actions/workflow/status/chriguschneider/hass-bora-dryer/ci.yml?branch=master&label=CI" /></a>
   <img alt="Home Assistant 2024.12+" src="https://img.shields.io/badge/Home%20Assistant-2024.12%2B-blue.svg" />
   <a href="https://github.com/chriguschneider/hass-bora-dryer/commits/master"><img alt="Last commit" src="https://img.shields.io/github/last-commit/chriguschneider/hass-bora-dryer" /></a>
   <a href="https://github.com/chriguschneider/hass-bora-dryer/stargazers"><img alt="Stars" src="https://img.shields.io/github/stars/chriguschneider/hass-bora-dryer" /></a>
@@ -252,66 +252,10 @@ to say thanks ❤️
 
 ## Changelog
 
-<details>
-<summary>Version history</summary>
-
-- **v0.8.1** — Maintenance release: the manifest no longer lists `Pillow` in
-  `requirements`. Pillow ships with Home Assistant, and hassfest rejects core
-  dependencies in a custom integration's manifest. No functional change.
-- **v0.8.0** — Sensors and binary sensors no longer drop to **unavailable**
-  when the device is switched off. They hold their last reading, and — via
-  `RestoreEntity` — that value now also survives a **Home Assistant restart**,
-  so a cold start with the dryer off still shows the last known filter wear,
-  firmware, temperature and humidity instead of a row of "unavailable". The
-  `Display` camera stays available (reads as idle rather than unavailable) and
-  simply serves no image while the device is offline. Note: frozen
-  temperature/humidity show a flat line in history until the device is back.
-- **v0.7.1** — Documentation release, no functional changes: fully redesigned
-  README (logo, badges, entity table, device-page screenshot), a petition for an
-  open local API (since reworked into the owner interest list on
-  [issue #4](https://github.com/chriguschneider/hass-bora-dryer/issues/4) after
-  Roth-Kippe entered into dialogue), and a draft for the Home Assistant
-  community post.
-- **v0.7.0** — Filter maintenance now surfaces as a **persistent notification**
-  instead of a repair issue under Settings → System → Repairs. A filter reminder
-  is real-world appliance maintenance, not a Home Assistant health problem, so
-  the notification panel is the idiomatic channel (mirroring how the Dreame
-  vacuum integration handles consumables). It self-clears once the filter is
-  reset on the device and can be turned off with the new *Show filter maintenance
-  notification* option. Dismissing it acknowledges the reminder — it stays gone
-  until the counter climbs over the threshold again, so it never re-nags on every
-  poll. Any leftover repair issue from earlier versions is removed on upgrade.
-- **v0.6.0** — Optional temperature and humidity fallback sensors. Pick an
-  external sensor in the options and the BORA's `Temperature` / `Humidity`
-  entities keep reporting from that source while the BORA is offline; its own
-  readings are used when it's online.
-- **v0.5.1** — When the device is unreachable, `Operation` reports `Off` and
-  `Drying` reports `false` instead of freezing on the last value — no more stuck
-  `Drying` readings when power is cut mid-cycle. Filter and firmware sensors keep
-  their last value (still factually correct when offline).
-- **v0.5.0** — Filter, firmware, operation and drying sensors retain their last
-  successful value while the device is unreachable instead of going
-  `unavailable`. Temperature and humidity still go `unavailable`, since a stale
-  reading would mislead. Closes
-  [#2](https://github.com/chriguschneider/hass-bora-dryer/issues/2).
-- **v0.4.0** — Built-in filter-maintenance reminder when operating hours exceed
-  the threshold; clears automatically once the filter is reset. Removes the need
-  for an external YAML automation. (Originally a repair issue; changed to a
-  persistent notification in v0.7.0.)
-- **v0.3.2** — Setup tolerates an offline device; entities register as
-  `unavailable` instead of failing to load. Closes
-  [#1](https://github.com/chriguschneider/hass-bora-dryer/issues/1).
-- **v0.3.1** — Optional power & energy mirror sensors from the upstream smart
-  plug.
-- **v0.3.0** — BORA device shown as *connected via* the upstream power switch
-  device once configured.
-- **v0.2.0** — Live LCD camera, set-clock button, options flow with power-switch
-  wrapper and configurable filter-due threshold, derived filter-remaining and
-  filter-progress sensors.
-- **v0.1.0** — Initial release: status sensors, drying & filter-due binary
-  sensors.
-
-</details>
+Every release is listed in
+[CHANGELOG.md](https://github.com/chriguschneider/hass-bora-dryer/blob/master/CHANGELOG.md);
+the [releases page](https://github.com/chriguschneider/hass-bora-dryer/releases)
+shows the same notes per version.
 
 ## License
 
