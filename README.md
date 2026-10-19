@@ -255,6 +255,9 @@ to say thanks ❤️
 <details>
 <summary>Version history</summary>
 
+- **v0.8.1** — Maintenance release: the manifest no longer lists `Pillow` in
+  `requirements`. Pillow ships with Home Assistant, and hassfest rejects core
+  dependencies in a custom integration's manifest. No functional change.
 - **v0.8.0** — Sensors and binary sensors no longer drop to **unavailable**
   when the device is switched off. They hold their last reading, and — via
   `RestoreEntity` — that value now also survives a **Home Assistant restart**,
