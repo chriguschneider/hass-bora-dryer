@@ -14,6 +14,13 @@ commits.
 
 ## [Unreleased]
 
+### Added
+
+- Diagnostics download (Settings → Devices & services → BORA → ⋮ →
+  Download diagnostics) with the parsed values and the last `status.html`
+  and `info.html` the dryer returned. Host, device id, IP and MAC addresses
+  and WLAN credentials are redacted, so it is safe to attach to an issue.
+
 ### Changed
 
 - Releases now ship a `bora_dryer.zip` asset, which HACS downloads instead
