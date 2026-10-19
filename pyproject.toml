@@ -1,0 +1,33 @@
+# Tooling config for the BORA dryer integration.
+# No build system: this repo ships the integration as source.
+
+[tool.ruff]
+target-version = "py313"
+line-length = 88
+# Developer tooling, not shipped and not linted in CI (`ruff check
+# custom_components tests`); listed so a bare `ruff check` agrees.
+extend-exclude = ["tools"]
+
+[tool.ruff.lint]
+# pyflakes, pycodestyle, bugbear, pyupgrade, import sorting.
+select = ["E", "F", "W", "B", "UP", "I"]
+
+[tool.ruff.lint.per-file-ignores]
+# The integration predates the lint gate. These four rules flag style only
+# (import order, `asyncio.TimeoutError` alias, 3 long lines, 1 unused import)
+# and were left alone when the gate was added so that PR changed no product
+# code. TODO: drop this block in a lint-only PR (`ruff check --fix` plus three
+# line wraps). Tests get the full rule set.
+"custom_components/**" = ["I001", "UP041", "E501", "F401"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["custom_components"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+# CI runs the `pytest` console script, which does not put the repo root on
+# sys.path. Tests import the integration package, so add the root.
+pythonpath = ["."]
+# pytest-homeassistant-custom-component needs this for its async fixtures.
+asyncio_mode = "auto"

@@ -19,3 +19,12 @@ firmware/*.pdf
 
 # Capture-campaign output (may contain device data)
 tools/log_capture_results/
+
+# Coverage output (never committed)
+coverage.xml
+.coverage
+/build/
+
+# Machine-local Claude notes (shared conventions: AGENTS.md, via CLAUDE.md)
+CLAUDE.local.md
+.claude/settings.local.json

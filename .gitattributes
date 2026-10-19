@@ -1,0 +1,7 @@
+# Normalise line endings: CI and Home Assistant run on Linux, the
+# maintainer sometimes works on Windows. Binary assets are left alone.
+* text=auto eol=lf
+*.png binary
+*.webp binary
+*.bin binary
+*.pdf binary

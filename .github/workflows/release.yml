@@ -1,0 +1,193 @@
+name: Release
+
+# ADR-0001: a pushed tag must not become a release on its own. The tag is checked
+# against the tree it points at, release notes must already exist in
+# CHANGELOG.md, and the integration ships as a zip asset so HACS counts
+# installs.
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+  actions: read # check the CI result of the tagged commit
+
+jobs:
+  release:
+    name: Verify tag and publish release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # The annotated tag object carries the release title (see below),
+          # and it is not present in a shallow clone of the commit alone.
+          fetch-depth: 0
+
+      - name: CI passed on the tagged commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ok="$(gh run list --workflow ci.yml --commit "$GITHUB_SHA" --status success --json databaseId --jq length)"
+          if [ "$ok" = "0" ]; then
+            echo "::error::No green CI run for $GITHUB_SHA. Tag a commit that passed CI on the default branch."
+            exit 1
+          fi
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+
+      # The full test requirements, not just pytest: tests/conftest.py imports
+      # the integration package, whose __init__ imports Home Assistant, so
+      # collecting even the two stdlib-only files below needs the HA test
+      # harness. With `pip install pytest` alone this step dies with
+      # ModuleNotFoundError and no release is ever cut.
+      - run: pip install -r requirements_test.txt
+
+      # File-to-file version sync and "a changelog section exists for the
+      # declared version" are already asserted by the test suite. Reuse it
+      # rather than re-deriving version strings in shell.
+      - name: Version files and changelog agree
+        run: pytest -q tests/test_metadata.py tests/test_changelog.py
+
+      - name: Tag matches the declared version
+        id: version
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME}"
+          version="${tag#v}"
+          declared="$(python -c 'import json,pathlib;print(json.loads(pathlib.Path("custom_components/bora_dryer/manifest.json").read_text(encoding="utf-8"))["version"])')"
+          if [ "$version" != "$declared" ]; then
+            echo "::error::Tag $tag declares version $version, but manifest.json says $declared."
+            exit 1
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Refuse to overwrite an existing release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "::error::A release for $TAG already exists. Delete it first, or tag a new version."
+            exit 1
+          fi
+
+      - name: Extract the changelog section
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          python - <<'PY'
+          import os, pathlib, re, sys
+
+          version = os.environ["VERSION"]
+          text = pathlib.Path("CHANGELOG.md").read_text(encoding="utf-8")
+          # Stops at the next section header, at the link-definition block
+          # that closes the file, or at EOF -- otherwise the oldest section
+          # would swallow every "[x.y.z]: https://..." line below it.
+          pattern = (
+              rf"^## \[v{re.escape(version)}\][^\n]*\n"
+              r"(.*?)(?=^## \[|^\[[^\]]+\]: |\Z)"
+          )
+          match = re.search(pattern, text, re.S | re.M)
+          if match is None:
+              sys.exit(f"::error::CHANGELOG.md has no '## [v{version}]' section.")
+          notes = match.group(1).strip()
+          if not notes:
+              sys.exit(f"::error::The '## [v{version}]' section in CHANGELOG.md is empty.")
+          pathlib.Path("release-notes.md").write_text(notes + "\n", encoding="utf-8")
+          print(f"Extracted {len(notes.splitlines())} lines of release notes.")
+          PY
+
+      # Releases are titled "<tag> — <what changed>". Nothing in the repo can
+      # derive that phrase, so it comes from the annotated tag's own message:
+      #     git tag -a v0.1.0 -m "what changed"
+      #
+      # Read via the API, not `git tag -l`: actions/checkout fetches the real
+      # tags and then force-overwrites the triggering one with the resolved
+      # commit, so locally the tag reports as a `commit` and its message is
+      # unreachable. Only annotated tags carry a subject; a lightweight tag
+      # yields a bare title rather than a commit subject.
+      - name: Build the release title
+        id: title
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          set -euo pipefail
+          tag="$TAG"
+          object_type="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" --jq '.object.type')"
+          subject=""
+          if [ "$object_type" = "tag" ]; then
+            object_sha="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" --jq '.object.sha')"
+            subject="$(gh api "repos/$GITHUB_REPOSITORY/git/tags/$object_sha" --jq '.message' | head -1)"
+          fi
+          # Tolerate a message that already repeats the tag.
+          subject="${subject#"$tag"}"
+          subject="${subject#" — "}"
+          subject="${subject#" - "}"
+          subject="${subject#": "}"
+          subject="${subject#" "}"
+          if [ -n "$subject" ]; then
+            title="$tag — $subject"
+          else
+            title="$tag"
+          fi
+          echo "Tag object type: $object_type"
+          echo "Release title: $title"
+          echo "title=$title" >> "$GITHUB_OUTPUT"
+
+      # HACS increments a release's download counter only when it pulls a
+      # release *asset*, and it only does that when hacs.json sets zip_release
+      # with a .zip filename. The zip holds the *contents* of the integration
+      # directory at its root: HACS extracts it straight into
+      # custom_components/<domain>/, so a wrapper folder would break installs.
+      # Only this directory is zipped: tools/ (reverse-engineering scripts) and
+      # firmware/ (vendor provenance) never ship; the layout check below fails
+      # on any file that is not tracked under custom_components/bora_dryer.
+      - name: Package the integration
+        run: |
+          set -euo pipefail
+          cd custom_components/bora_dryer
+          # -X drops extra file attributes, keeping the archive reproducible.
+          # __pycache__ can exist by now: the test step above ran pytest.
+          zip -r -X "$GITHUB_WORKSPACE/bora_dryer.zip" . \
+            -x '*__pycache__*' -x '*.pyc'
+
+      - name: Verify the zip layout
+        run: |
+          set -euo pipefail
+          unzip -l bora_dryer.zip
+          if ! unzip -Z1 bora_dryer.zip | sed 's|^\./||' | grep -qx 'manifest.json'; then
+            echo "::error::manifest.json is not at the root of the zip."
+            exit 1
+          fi
+          if unzip -Z1 bora_dryer.zip | grep -q '__pycache__'; then
+            echo "::error::__pycache__ leaked into the release asset."
+            exit 1
+          fi
+          # Exactly the tracked files of the integration, subfolders included
+          # (brand/, translations/, a bundled frontend/): a missing file breaks
+          # installs, an extra one is something nobody reviewed.
+          (cd custom_components/bora_dryer && git ls-files | sort) > expected.txt
+          unzip -Z1 bora_dryer.zip | sed 's|^\./||' | grep -v '/$' | sort > actual.txt
+          if ! diff -u expected.txt actual.txt; then
+            echo "::error::The zip does not hold exactly the tracked files of custom_components/bora_dryer (diff above)."
+            exit 1
+          fi
+
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+          TITLE: ${{ steps.title.outputs.title }}
+        run: |
+          gh release create "$TAG" \
+            --title "$TITLE" \
+            --notes-file release-notes.md \
+            --verify-tag \
+            bora_dryer.zip
