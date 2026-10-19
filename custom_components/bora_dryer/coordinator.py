@@ -52,6 +52,8 @@ class BoraDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         self.entry = entry
         self._host: str = entry.data["host"]
         self._session = async_get_clientsession(hass)
+        # Last raw page texts, kept only for the diagnostics download.
+        self.last_raw: dict[str, str] = {}
 
     async def _fetch(self, path: str) -> str:
         url = f"http://{self._host}/{path}"
@@ -71,6 +73,8 @@ class BoraDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             )
         except (aiohttp.ClientError, asyncio.TimeoutError) as err:
             raise UpdateFailed(f"Error fetching BORA data: {err}") from err
+
+        self.last_raw = {"status.html": status_html, "info.html": info_html}
 
         data: dict[str, Any] = {
             "temperature": None,
