@@ -5,7 +5,7 @@ from datetime import timedelta
 
 DOMAIN = "bora_dryer"
 # Keep in sync with manifest.json "version" (tests/test_metadata.py checks it).
-VERSION = "0.8.1"
+VERSION = "0.9.0"
 
 DEFAULT_HOST = "192.168.1.100"
 DEFAULT_NAME = "BORA"

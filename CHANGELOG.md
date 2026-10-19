@@ -14,6 +14,8 @@ commits.
 
 ## [Unreleased]
 
+## [v0.9.0] — 2026-10-19
+
 ### Added
 
 - Diagnostics download (Settings → Devices & services → BORA → ⋮ →
@@ -158,7 +160,8 @@ commits.
 
 - Initial release: status sensors, drying & filter-due binary sensors.
 
-[Unreleased]: https://github.com/chriguschneider/hass-bora-dryer/compare/v0.8.1...HEAD
+[Unreleased]: https://github.com/chriguschneider/hass-bora-dryer/compare/v0.9.0...HEAD
+[v0.9.0]: https://github.com/chriguschneider/hass-bora-dryer/compare/v0.8.1...v0.9.0
 [v0.8.1]: https://github.com/chriguschneider/hass-bora-dryer/releases/tag/v0.8.1
 [v0.8.0]: https://github.com/chriguschneider/hass-bora-dryer/releases/tag/v0.8.0
 [v0.7.1]: https://github.com/chriguschneider/hass-bora-dryer/releases/tag/v0.7.1
