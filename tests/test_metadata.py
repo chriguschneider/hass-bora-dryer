@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import re
+import struct
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -123,6 +124,38 @@ def test_hacs_json_is_valid() -> None:
     assert re.fullmatch(r"\d{4}\.\d+\.\d+", hacs["homeassistant"])
     # HACS renders the README as the store page.
     assert hacs.get("render_readme") is True
+
+
+def _png_size(path: Path) -> tuple[int, int]:
+    """Width and height from the IHDR chunk; the header is fixed-position."""
+    header = path.read_bytes()[:24]
+    assert header[:8] == b"\x89PNG\r\n\x1a\n", f"{path.name} is not a PNG"
+    return struct.unpack(">II", header[16:24])
+
+
+def test_brand_images_follow_home_assistant_size_rules() -> None:
+    """Sizes hassfest enforces for brand images (issue #20, hacs/default#9857).
+
+    icon 256x256, icon@2x 512x512; logo shortest side 128-256 px, logo@2x
+    shortest side 256-512 px. hassfest's own error text is the source:
+    "brand/logo.png is 512x512, but its shortest side must be between 128
+    and 256 pixels". icon@2x and logo@2x are optional; checked when present.
+    """
+    brand = COMPONENT / "brand"
+
+    width, height = _png_size(brand / "icon.png")
+    assert (width, height) == (256, 256), f"icon.png is {width}x{height}"
+
+    if (brand / "icon@2x.png").exists():
+        width, height = _png_size(brand / "icon@2x.png")
+        assert (width, height) == (512, 512), f"icon@2x.png is {width}x{height}"
+
+    width, height = _png_size(brand / "logo.png")
+    assert 128 <= min(width, height) <= 256, f"logo.png is {width}x{height}"
+
+    if (brand / "logo@2x.png").exists():
+        width, height = _png_size(brand / "logo@2x.png")
+        assert 256 <= min(width, height) <= 512, f"logo@2x.png is {width}x{height}"
 
 
 def test_zip_release_asset_is_wired_end_to_end() -> None:

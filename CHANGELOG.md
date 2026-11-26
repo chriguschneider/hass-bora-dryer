@@ -14,6 +14,12 @@ commits.
 
 ## [Unreleased]
 
+### Changed
+
+- Brand images now follow the Home Assistant size rules (logo 256 px,
+  logo@2x 512 px), so the integration can pass the HACS default-repository
+  review.
+
 ## [v0.9.0] — 2026-10-19
 
 ### Added
