@@ -14,11 +14,26 @@ commits.
 
 ## [Unreleased]
 
-### Changed
+## [v0.9.1] — 2026-11-28
+
+![The BORA logo looks the same as before; only the image files now come in the sizes Home Assistant expects.](https://raw.githubusercontent.com/chriguschneider/hass-bora-dryer/master/images/brand-logo-sizes.png)
+
+**Nothing changes for you; this version gets the integration ready for the default HACS store.** The logo now comes in the two sizes Home Assistant asks for. It looks exactly as before. Once the HACS team accepts it, you will find the integration in HACS without adding a custom repository.
+
+**What you need to do:** nothing.
+
+### Details
+
+#### Changed
 
 - Brand images now follow the Home Assistant size rules (logo 256 px,
   logo@2x 512 px), so the integration can pass the HACS default-repository
   review.
+
+#### Under the hood
+
+- A test checks the sizes of all brand images.
+- Updated GitHub Actions and the agent workflows.
 
 ## [v0.9.0] — 2026-10-19
 
@@ -166,7 +181,8 @@ commits.
 
 - Initial release: status sensors, drying & filter-due binary sensors.
 
-[Unreleased]: https://github.com/chriguschneider/hass-bora-dryer/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/chriguschneider/hass-bora-dryer/compare/v0.9.1...HEAD
+[v0.9.1]: https://github.com/chriguschneider/hass-bora-dryer/compare/v0.9.0...v0.9.1
 [v0.9.0]: https://github.com/chriguschneider/hass-bora-dryer/compare/v0.8.1...v0.9.0
 [v0.8.1]: https://github.com/chriguschneider/hass-bora-dryer/releases/tag/v0.8.1
 [v0.8.0]: https://github.com/chriguschneider/hass-bora-dryer/releases/tag/v0.8.0
